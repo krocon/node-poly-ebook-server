@@ -1,0 +1,4 @@
+<html><head><link rel="import" href="../app-scroll-effects-behavior.html">
+
+<script>Polymer.AppLayout.registerEffect("fade-background",{setUp:function(t){var r=t.duration||"0.5s";this.$.backgroundFrontLayer.style.willChange="opacity",this.$.backgroundFrontLayer.style.webkitTransform="translateZ(0)",this.$.backgroundFrontLayer.style.transitionProperty="opacity",this.$.backgroundFrontLayer.style.transitionDuration=r,this.$.backgroundRearLayer.style.willChange="opacity",this.$.backgroundRearLayer.style.webkitTransform="translateZ(0)",this.$.backgroundRearLayer.style.transitionProperty="opacity",this.$.backgroundRearLayer.style.transitionDuration=r},run:function(t,r){t>=1?(this.$.backgroundFrontLayer.style.opacity=0,this.$.backgroundRearLayer.style.opacity=1):(this.$.backgroundFrontLayer.style.opacity=1,this.$.backgroundRearLayer.style.opacity=0)}});</script>
+</head><body></body></html>

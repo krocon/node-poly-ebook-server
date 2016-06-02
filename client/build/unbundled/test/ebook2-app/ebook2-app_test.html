@@ -1,0 +1,21 @@
+<!DOCTYPE html><html><head>
+    <title>ebook2-app test</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1,user-scalable=yes">
+    <script src="../../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../../web-component-tester/browser.js"></script>
+
+    <link rel="import" href="../../src/ebook2-app/ebook2-app.html">
+  </head>
+  <body>
+
+    <test-fixture id="basic">
+      <template>
+        <ebook2-app></ebook2-app>
+      </template>
+    </test-fixture>
+
+    <script>suite("ebook2-app",function(){test("instantiating the element works",function(){var t=fixture("basic");assert.equal(t.is,"ebook2-app")})});</script>
+  
+
+</body></html>

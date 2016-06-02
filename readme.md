@@ -1,0 +1,96 @@
+# poly-ebook-server
+
+WebApp (Client/Server) for own ebook content: comics, pdfs and epubs (cbr,cbz,cb7,epub,pdf,...).
+
+This tool serves ebooks of given directories (and their sub directories).
+Depending on the bookExtensions option one can show comics, ebooks or something else.
+If for a book (abc.cbr) a thumb file exists (abc.jpg), the thumb will be displayed instead of it's name.
+
+In the browser: all books are displayed in a thumb view. This view is optimized for a large number of books (Polymer iron-list).
+With help of a simple text input one can filter the list of the books.
+
+Technology: Server based on node.js (poly-ebook-server), client based on Google Polymer (poly-ebook-client).
+
+## Getting started
+
+
+
+### ebook-cover-generator
+This tool doesn't generate thumbs of your ebooks.
+If you want to do this, you can use [ebook-cover-generator](https://www.npmjs.com/package/ebook-cover-generator).
+On Mac OS X I recommend this tool: [cover-generator-by-quicklook](https://www.npmjs.com/package/cover-generator-by-quicklook).
+
+## Usage (script)
+```js
+var server = require('poly-ebook');
+server.start(options<Object>);
+```
+
+### Examples
+
+#### Example with 3 start directories
+This is an example for three different ebook types. In the json structure we have three sections (see below).
+Each section will be rendered as a tab in the browser. Each section has a start directory.
+All files in this directory and it's sub directories which fits to the file extension(s), will be displayed below the corresponding tab. If for a file a jpg exist, this will be display in the selected dimension (thumbsDims and dimIndex). The user has the possibility to change the thumb size at runtime.
+
+```js
+(function () {
+  "use strict";
+
+  var server = require('poly-ebbook-server');
+  var options = {
+    title: "Ebooks",
+    clientRoot: __dirname + '/../client',
+    port: 8081,
+
+    sectionIndex: 0,
+    sections: [
+      {
+        label: "Epub",
+        bookExtensions: ['.epub'],
+        baseDir: "/Users/marc/ebooks/Romane/alphabet",
+        thumbsDims: [
+          {width: 105, height: 150},
+          {width: 210, height: 300},
+          {width: 315, height: 450},
+          {width: 420, height: 600}
+        ],
+        dimIndex: 1,
+        initialFilter: 'krimi'
+      },
+      {
+        label: "Comic",
+        bookExtensions: [".cbz", ".cbr"],
+        baseDir: "/Volumes/2TB/jdownload/_comics",
+        thumbsDims: [
+          {width: 83, height: 150},
+          {width: 196, height: 300},
+          {width: 329, height: 450},
+          {width: 392, height: 600}
+        ],
+        dimIndex: 1,
+        initialFilter: "bill"
+      },
+      {
+        label: "Magazine",
+        bookExtensions: ['.pdf'],
+        baseDir: "/Volumes/2TB/jdownload/_magazine",
+        thumbsDims: [
+          {width: 105, height: 150},
+          {width: 210, height: 300},
+          {width: 315, height: 450},
+          {width: 420, height: 600}
+        ],
+        dimIndex: 1,
+        initialFilter: ''
+      }
+    ]
+  };
+  server.start(options);
+
+})();
+
+```
+
+
+

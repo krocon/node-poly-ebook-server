@@ -1,0 +1,4 @@
+<html><head><link rel="import" href="../app-scroll-effects-behavior.html">
+
+<script>Polymer.AppLayout.registerEffect("blend-background",{setUp:function(){this.$.backgroundFrontLayer.style.willChange="opacity",this.$.backgroundFrontLayer.style.webkitTransform="translateZ(0)",this.$.backgroundRearLayer.style.willChange="opacity",this.$.backgroundRearLayer.style.webkitTransform="translateZ(0)",this.$.backgroundRearLayer.style.opacity=0},run:function(t,a){this.$.backgroundFrontLayer.style.opacity=1-t,this.$.backgroundRearLayer.style.opacity=t}});</script>
+</head><body></body></html>

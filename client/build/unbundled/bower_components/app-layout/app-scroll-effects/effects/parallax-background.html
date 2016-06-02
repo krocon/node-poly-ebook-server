@@ -1,0 +1,4 @@
+<html><head><link rel="import" href="../app-scroll-effects-behavior.html">
+
+<script>Polymer.AppLayout.registerEffect("parallax-background",{setUp:function(t){var a=parseFloat(t.scalar);this._deltaBg=this.$.backgroundFrontLayer.offsetHeight-this.$.background.offsetHeight,0===this._deltaBg?(isNaN(a)&&(a=.8),this._deltaBg=this._dHeight*a):(isNaN(a)&&(a=1),this._deltaBg=this._deltaBg*a)},tearDown:function(){delete this._deltaBg},run:function(t,a){this.transform("translate3d(0px, "+this._deltaBg*Math.min(1,t)+"px, 0px)",this.$.backgroundFrontLayer),this.$.backgroundRearLayer&&this.transform("translate3d(0px, "+this._deltaBg*Math.min(1,t)+"px, 0px)",this.$.backgroundRearLayer)}});</script>
+</head><body></body></html>
