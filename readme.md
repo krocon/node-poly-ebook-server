@@ -22,6 +22,22 @@ This tool doesn't generate thumbs of your ebooks.
 If you want to do this, you can use [ebook-cover-generator](https://www.npmjs.com/package/ebook-cover-generator).
 On Mac OS X I recommend this tool: [cover-generator-by-quicklook](https://www.npmjs.com/package/cover-generator-by-quicklook).
 
+## Installation
+
+Create an empty folder. Open your shell (console) and navigate to this folder. Enter:
+> npm i poly-ebook-server
+
+A directory named *node_modules* is created with some sub folders. Navigate to *node_modules/poly-ebook-server*:
+> cd node_modules/poly-ebook-server
+
+Edit node start file (dev.js or prod.js) and adapt the configuration:
+> open dev.js
+
+Start app with:
+> node dev.js
+
+In case of an error have a look at *clientRoot: __dirname + '/../client(/build/bundled)'* and the *baseDir:...*.
+
 ## Usage (script)
 ```js
 var server = require('poly-ebook-server');
@@ -41,7 +57,7 @@ In case of an error have a look at clientRoot: __dirname + '/../client'.
 (function () {
   "use strict";
 
-  var server = require('poly-ebbook-server');
+  var server = require('./index-js');
   var options = {
     title: "Ebooks",
     clientRoot: __dirname + '/client',
