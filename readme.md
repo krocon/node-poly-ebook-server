@@ -9,7 +9,9 @@ If for a book (abc.cbr) a thumb file exists (abc.jpg), the thumb will be display
 In the browser: all books are displayed in a thumb view. This view is optimized for a large number of books (Polymer iron-list).
 With help of a simple text input one can filter the list of the books.
 
-Technology: Server based on node.js (poly-ebook-server), client based on Google Polymer (poly-ebook-client).
+Technology: Server based on node.js, client based on Google Polymer.
+
+![screen](https://cloud.githubusercontent.com/assets/11378781/15753881/d9912384-28f5-11e6-99bd-c35bdc229398.png)
 
 ## Getting started
 
@@ -22,7 +24,7 @@ On Mac OS X I recommend this tool: [cover-generator-by-quicklook](https://www.np
 
 ## Usage (script)
 ```js
-var server = require('poly-ebook');
+var server = require('poly-ebook-server');
 server.start(options<Object>);
 ```
 
@@ -33,6 +35,8 @@ This is an example for three different ebook types. In the json structure we hav
 Each section will be rendered as a tab in the browser. Each section has a start directory.
 All files in this directory and it's sub directories which fits to the file extension(s), will be displayed below the corresponding tab. If for a file a jpg exist, this will be display in the selected dimension (thumbsDims and dimIndex). The user has the possibility to change the thumb size at runtime.
 
+In case of an error have a look at clientRoot: __dirname + '/../client'.
+
 ```js
 (function () {
   "use strict";
@@ -40,9 +44,8 @@ All files in this directory and it's sub directories which fits to the file exte
   var server = require('poly-ebbook-server');
   var options = {
     title: "Ebooks",
-    clientRoot: __dirname + '/../client',
+    clientRoot: __dirname + '/client',
     port: 8081,
-
     sectionIndex: 0,
     sections: [
       {

@@ -1,6 +1,6 @@
 {
-  "name": "home-ebook-server",
-  "version": "0.0.10",
+  "name": "poly-ebook-server",
+  "version": "0.0.2",
   "description": "Webserver for own ebook content: comics and epubs (cbr,cbz,cb7,epub, PDF)",
   "keywords": [
     "Cover",
@@ -37,6 +37,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/krocon/node-home-ebook-server"
+    "url": "https://github.com/krocon/node-poly-ebook-server.git"
   }
 }
