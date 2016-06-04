@@ -1,0 +1,326 @@
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/effects/waterfall.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-scroll-threshold/iron-scroll-threshold.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/iron-list/iron-list.html">
+
+<link rel="import" href="../bower_components/paper-styles/color.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+
+<dom-module id="poly-ebook-view">
+    <template>
+
+        <style is="custom-style">
+            :root {
+                --ebooks-green: #00ca8b;
+                --ebooks-red: #fd5d57;
+                --ebooks-yellow: #ffc92a;
+
+                --primary-text-color: #c6d9f1;
+
+                --paper-input-container-label: {
+                    color: var(--primary-text-color);
+                };
+                --paper-listbox-background-color: #262f3a;
+
+                --paper-toolbar-background: rgb(43, 54, 67);
+                --paper-toolbar-color: var(--primary-text-color);
+
+                --paper-input-container-color: #99a6b9;
+                --paper-input-container-focus-color: #408ff9;
+                --paper-input-container-invalid-color: var(--ebooks-red);
+                --paper-input-container-input-color: var(--primary-text-color);
+                --paper-tabs-selection-bar-color: var(--ebooks-yellow);
+
+                --photo-content-detail : {
+                    background: rgba(63, 79, 99, 0.85);
+                };
+                --thumb-link-color: #fff;
+            }
+
+            :host {
+                display: block;
+                @apply(--paper-font-common-base);
+            }
+
+            paper-dropdown-menu {
+                margin-left: 40px;
+                margin-right: 40px;
+            }
+
+            app-header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1;
+                background-color: var(--paper-toolbar-background);
+                color: var(--primary-text-color);
+                --app-header-background-front-layer: {
+                    background: var(--paper-toolbar-background);
+                };
+            }
+
+
+            paper-tabs {
+                margin-right:40px;
+            }
+
+            span.green {
+                color: var(--ebooks-green);
+            }
+            span.yellow {
+                color: var(--ebooks-yellow);
+            }
+            span.red {
+                color: var(--ebooks-red);
+            }
+
+            iron-list {
+                margin-top: 80px;
+                padding-bottom: 20px;
+            }
+
+            .thumbContent {
+                @apply(--layout);
+                background-color: var(--paper-toolbar-background);
+                position: relative;
+                margin: 0px;
+            }
+
+            .thumbContent:hover .detail {
+                opacity: 1;
+            }
+
+            .thumbContent > iron-image {
+                @apply(--layout-flex);
+            }
+
+            .thumbContent > .detail {
+                @apply(--photo-content-detail);
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                font-size: 18px;
+                font-weight: bold;
+                padding: 0;
+                opacity: 0;
+                transition: opacity 0.1s;
+            }
+
+            .thumbContent > .detail > a {
+                color: var(--thumb-link-color);
+                cursor: pointer;
+                text-decoration: inherit;
+            }
+
+            .self-end {
+                /* This mixin (from iron-flex-layout) aligns the tabs to the bottom of the toolbar. */
+                @apply(--layout-self-end);
+            }
+
+        </style>
+
+        <iron-ajax auto url="../init.json" handle-as="json" last-response="{{options}}"></iron-ajax>
+        <iron-ajax auto url="{{_getLoadFilesUrl(options.sectionIndex)}}" handle-as="json" last-response="{{files}}"></iron-ajax>
+
+
+        <app-header condenses fixed effects="blend-background waterfall">
+            <app-toolbar>
+
+                <h4 title>[[options.title]] (<span class$="{{counterclass}}"><span hidden$="{{ishidden}}">{{filteredFiles.length}} / </span>{{files.length}}</span>)</h4>
+
+                <paper-tabs id="sectionTabs" selected="{{options.sectionIndex}}" class="bottom self-end">
+                    <template is="dom-repeat" items="{{options.sections}}">
+                        <paper-tab>{{item.label}}</paper-tab>
+                    </template>
+                </paper-tabs>
+
+                <paper-input label="Search" value="{{searchText::input}}">
+                    <iron-icon icon="search" prefix></iron-icon>
+                    <iron-icon suffix hidden$="{{!searchText}}" on-tap="clearInput" icon="clear" alt="clear" title="clear"></iron-icon>
+                </paper-input>
+
+                <paper-dropdown-menu label="Thumb Sizes">
+                    <paper-listbox class="dropdown-content" selected="{{thumbDimsIndex}}">
+                        <template is="dom-repeat" items="{{thumbDims}}">
+                            <paper-item>{{item.width}} x {{item.height}}</paper-item>
+                        </template>
+                    </paper-listbox>
+                </paper-dropdown-menu>
+
+                <paper-icon-button hidden$="{{isFullScreen()}}" icon="fullscreen" on-tap="toggleFullScreen"></paper-icon-button>
+                <paper-icon-button hidden$="{{!isFullScreen()}}" icon="fullscreen-exit" on-tap="toggleFullScreen"></paper-icon-button>
+            </app-toolbar>
+        </app-header>
+
+        <iron-list items="{{filteredFiles}}" as="file" scroll-target="document" grid>
+            <template>
+                <div class="thumbContainer">
+                    <div class="thumbContent" style$="{{thumbCss}}" tabindex$="[[tabIndex]]" title="{{index}}) [[_computeTitle(file)]]">
+                        <iron-image sizing="cover" src="[[_computeImgUrl(file)]]"></iron-image>
+
+                        <div class="detail">&nbsp;<a href="../[[file]]" target="_blank"><iron-icon icon="cloud-download"></iron-icon> Download</a></div>
+                    </div>
+                </div>
+            </template>
+        </iron-list>
+
+    </template>
+
+    <script>
+        HTMLImports.whenReady(function () {
+
+            Polymer({
+                is: 'poly-ebook-view',
+
+                properties: {
+                    options: Object,
+                    files: Array,
+                    filteredFiles: {
+                        type: Array,
+                        value: []
+                    },
+                    thumbDims: Array,
+                    thumbDimsIndex: Number,
+                    thumbCss: String,
+                    counterclass: {
+                        type: String,
+                        value: 'green'
+                    },
+                    searchText: {
+                        type: String,
+                        value: ''
+                    },
+                    ishidden: {
+                        type: Boolean,
+                        value: true
+                    },
+                    listEle: HTMLElement
+                },
+                observers: [
+                    '_filterFiles(files, searchText)',
+                    '_resetBySectionIndex(options.sectionIndex)',
+                    '_resetByThumbDimsIndex(thumbDimsIndex)'
+                ],
+                clearInput: function(){
+                    this.searchText = '';
+                },
+                isFullScreen: function () {
+                    return !(!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement);
+                },
+                toggleFullScreen: function () {
+                    // https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API
+                    if (!this.isFullScreen()) {
+                        var documentElement = document.documentElement;
+                        if (documentElement.requestFullscreen) {
+                            documentElement.requestFullscreen();
+                        } else if (documentElement.msRequestFullscreen) {
+                            documentElement.msRequestFullscreen();
+                        } else if (documentElement.mozRequestFullScreen) {
+                            documentElement.mozRequestFullScreen();
+                        } else if (documentElement.webkitRequestFullscreen) {
+                            documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+                        }
+                    } else {
+                        if (document.exitFullscreen) {
+                            document.exitFullscreen();
+                        } else if (document.msExitFullscreen) {
+                            document.msExitFullscreen();
+                        } else if (document.mozCancelFullScreen) {
+                            document.mozCancelFullScreen();
+                        } else if (document.webkitExitFullscreen) {
+                            document.webkitExitFullscreen();
+                        }
+                    }
+                },
+
+                _resetByThumbDimsIndex: function(thumbDimsIndex){
+                    this.thumbCss = [
+                        'width:', this.thumbDims[this.thumbDimsIndex].width,'px;',
+                        'height:', this.thumbDims[this.thumbDimsIndex].height, 'px;'
+                    ].join('');
+                    document.querySelector('iron-list').fire('iron-resize');
+                },
+                _resetBySectionIndex: function(sectionIndex){
+                    this.searchText = this.options.sections[sectionIndex].initialFilter;
+                    this.thumbDims = this.options.sections[sectionIndex].thumbsDims;
+                    this.thumbDimsIndex = this.options.sections[sectionIndex].dimIndex;
+                    this._resetByThumbDimsIndex(this.thumbDimsIndex);
+                },
+                _filterFiles: function(files, searchText){
+                    var ret;
+                    var filterWords;
+
+                    var isOk = function isOk(value) {
+                        for (var i = 0; i < filterWords.length; i++) {
+                            var word = filterWords[i];
+                            if (word && word.length > 0) {
+                                var chr0 = word.substr(0, 1);
+                                if (chr0 === '!' || chr0 === '-') {
+                                    // '-abc' --> word 'abc' is not allowed:
+                                    if (word.length > 1 && value.toLowerCase().indexOf(word.substr(1)) > -1) return false;
+                                } else {
+                                    if (value.toLowerCase().indexOf(word) === -1) return false;
+                                }
+                            }
+                        }
+                        return true;
+                    };
+
+                    if (!files) ret = null;
+                    if (!ret && !searchText) ret= files;
+
+                    if (!ret) {
+                        filterWords = searchText.toLowerCase().split(' ');
+                        ret = files.filter(isOk);
+                    }
+
+                    this.filteredFiles = ret;
+                    this.ishidden = this.filteredFiles.length === this.files.length;
+                    this.counterclass = this.filteredFiles.length === 0 ? 'red' : (this.ishidden ? 'green': 'yellow');
+                    document.querySelector('iron-list').fire('iron-resize');
+                },
+                _getLoadFilesUrl: function (sectionIndex) {
+                    if (sectionIndex==undefined) return null;
+                    return '/'+ sectionIndex+'/files.json';
+                },
+                _computeTitle: function (file) {
+                    return file.substring(1 + file.lastIndexOf('/'));
+                },
+                _computeImgUrl: function (file) {
+                    var img = file.replace('file/', 'img/');
+                    img = img.substr(0, img.lastIndexOf('.')) + '.jpg';
+                    return img;
+                },
+                attached: function () {
+                    console.info('attached...');
+                },
+                ready: function () {
+                    console.info('ready...');
+                }
+            });
+
+        });
+
+    </script>
+
+</dom-module>
