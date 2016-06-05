@@ -21,10 +21,11 @@
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 
-<dom-module id="poly-ebook-view">
+<dom-module id="poly-ebook-view" >
     <template>
 
         <style is="custom-style">
@@ -59,6 +60,8 @@
                 display: block;
                 @apply(--paper-font-common-base);
             }
+
+            #scrollLetterView { position:fixed;top: 50%; right: 10px;}
 
             paper-dropdown-menu {
                 margin-left: 40px;
@@ -100,7 +103,7 @@
 
             .thumbContent {
                 @apply(--layout);
-                background-color: var(--paper-toolbar-background);
+                /*background-color: var(--paper-toolbar-background);*/
                 position: relative;
                 margin: 0px;
             }
@@ -184,6 +187,9 @@
             </template>
         </iron-list>
 
+        <paper-fab hidden$="{{scrollLetter==''}}" id="scrollLetterView" label="[[scrollLetter]]"></paper-fab>
+
+
     </template>
 
     <script>
@@ -214,6 +220,7 @@
                         type: Boolean,
                         value: true
                     },
+                    scrollLetter: '',
                     listEle: HTMLElement
                 },
                 observers: [
@@ -221,6 +228,7 @@
                     '_resetBySectionIndex(options.sectionIndex)',
                     '_resetByThumbDimsIndex(thumbDimsIndex)'
                 ],
+
                 clearInput: function(){
                     this.searchText = '';
                 },
@@ -254,6 +262,7 @@
                 },
 
                 _resetByThumbDimsIndex: function(thumbDimsIndex){
+                    this.scrollLetter = '';
                     this.thumbCss = [
                         'width:', this.thumbDims[this.thumbDimsIndex].width,'px;',
                         'height:', this.thumbDims[this.thumbDimsIndex].height, 'px;'
@@ -261,6 +270,7 @@
                     document.querySelector('iron-list').fire('iron-resize');
                 },
                 _resetBySectionIndex: function(sectionIndex){
+                    this.scrollLetter = '';
                     this.searchText = this.options.sections[sectionIndex].initialFilter;
                     this.thumbDims = this.options.sections[sectionIndex].thumbsDims;
                     this.thumbDimsIndex = this.options.sections[sectionIndex].dimIndex;
@@ -269,6 +279,7 @@
                 _filterFiles: function(files, searchText){
                     var ret;
                     var filterWords;
+                    this.scrollLetter = '';
 
                     var isOk = function isOk(value) {
                         for (var i = 0; i < filterWords.length; i++) {
@@ -313,6 +324,13 @@
                 },
                 attached: function () {
                     console.info('attached...');
+                    var list = document.querySelector('iron-list');
+                    var self = this;
+                    var scrollListener = function () {
+                        var item= self.filteredFiles[list.firstVisibleIndex];
+                        self.scrollLetter = item.substr(item.lastIndexOf('/')+1, 1).trim().toUpperCase();
+                    };
+                    window.addEventListener('scroll', scrollListener);
                 },
                 ready: function () {
                     console.info('ready...');
