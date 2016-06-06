@@ -11,11 +11,17 @@
 <link rel="import" href="../bower_components/iron-image/iron-image.html">
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-icons/av-icons.html">
 <link rel="import" href="../bower_components/iron-scroll-threshold/iron-scroll-threshold.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../bower_components/iron-flex-layout/classes/iron-flex-layout.html">
+<!--<link rel="import" href="../bower_components/iron-dropdown/iron-dropdown.html">-->
 
+<!--<link rel="import" href="../bower_components/neon-animation/neon-animations.html">-->
 <link rel="import" href="../bower_components/paper-styles/color.html">
+<!--<link rel="import" href="../bower_components/paper-menu/paper-menu.html">-->
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
@@ -23,7 +29,7 @@
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
-<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+
 
 <dom-module id="poly-ebook-view" >
     <template>
@@ -61,9 +67,27 @@
                 @apply(--paper-font-common-base);
             }
 
-            #scrollLetterView { position:fixed;top: 50%; right: 10px;}
+            paper-fab.rotated {
+                transform: rotate(-90deg);
+                transform-origin: 50% 50%;
+            }
 
-            paper-dropdown-menu {
+            #scrollLetterView {
+                --paper-fab-background: var(--paper-light-blue-500);
+                --paper-fab-keyboard-focus-background: var(--paper-light-blue-900);
+            }
+            #scrollLetterView, #dd1, #dd2, #dd3, #dd4 {
+                position:fixed;top: 50%; right: 10px;
+            }
+
+            #dd1 {margin-top: -120px;}
+            #dd2 {margin-top: -60px;}
+            #dd3 {margin-top: 60px;}
+            #dd4 {margin-top: 120px;}
+
+
+
+            app-header paper-dropdown-menu {
                 margin-left: 40px;
                 margin-right: 40px;
             }
@@ -82,7 +106,7 @@
             }
 
 
-            paper-tabs {
+            app-header paper-tabs {
                 margin-right:40px;
             }
 
@@ -175,20 +199,30 @@
             </app-toolbar>
         </app-header>
 
-        <iron-list items="{{filteredFiles}}" as="file" scroll-target="document" grid>
+        <iron-list id="list" items="{{filteredFiles}}" as="file" scroll-target="document" grid>
             <template>
                 <div class="thumbContainer">
                     <div class="thumbContent" style$="{{thumbCss}}" tabindex$="[[tabIndex]]" title="{{index}}) [[_computeTitle(file)]]">
                         <iron-image sizing="cover" src="[[_computeImgUrl(file)]]"></iron-image>
 
-                        <div class="detail">&nbsp;<a href="../[[file]]" target="_blank"><iron-icon icon="cloud-download"></iron-icon> Download</a></div>
+                        <div class="detail">
+                            <a href="../[[file]]" target="_blank">
+                                <paper-fab icon="cloud-download"></paper-fab>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </template>
         </iron-list>
 
-        <paper-fab hidden$="{{scrollLetter==''}}" id="scrollLetterView" label="[[scrollLetter]]"></paper-fab>
 
+        <paper-fab id="dd1" hidden$="{{!scrollControlVisible}}" on-click="scroll2Top" icon="av:skip-next" class="rotated"></paper-fab>
+        <paper-fab id="dd2" hidden$="{{!scrollControlVisible}}" on-click="scrollUp" icon="av:fast-forward" class="rotated"></paper-fab>
+
+        <paper-fab id="scrollLetterView" label="[[scrollLetter]]" on-click="openDropdown"></paper-fab>
+
+        <paper-fab id="dd3" hidden$="{{!scrollControlVisible}}" on-click="scrollDown" icon="av:fast-rewind" class="rotated"></paper-fab>
+        <paper-fab id="dd4" hidden$="{{!scrollControlVisible}}" on-click="scroll2End" icon="av:skip-previous" class="rotated"></paper-fab>
 
     </template>
 
@@ -220,6 +254,10 @@
                         type: Boolean,
                         value: true
                     },
+                    scrollControlVisible: {
+                        type: Boolean,
+                        value: false
+                    },
                     scrollLetter: '',
                     listEle: HTMLElement
                 },
@@ -228,7 +266,21 @@
                     '_resetBySectionIndex(options.sectionIndex)',
                     '_resetByThumbDimsIndex(thumbDimsIndex)'
                 ],
-
+                openDropdown: function(){
+                    this.scrollControlVisible = !this.scrollControlVisible;
+                },
+                scroll2Top: function(){
+                    this.listEle.scrollToIndex(0);
+                },
+                scrollUp: function(){
+                    this.listEle.scrollToIndex(this.listEle.firstVisibleIndex - this.filteredFiles.length/20);
+                },
+                scrollDown: function(){
+                    this.listEle.scrollToIndex(this.listEle.firstVisibleIndex + this.filteredFiles.length/20);
+                },
+                scroll2End: function(){
+                    this.listEle.scrollToIndex(this.filteredFiles.length - 1);
+                },
                 clearInput: function(){
                     this.searchText = '';
                 },
@@ -304,7 +356,7 @@
                         filterWords = searchText.toLowerCase().split(' ');
                         ret = files.filter(isOk);
                     }
-
+                    this.scrollControlVisible = false;
                     this.filteredFiles = ret;
                     this.ishidden = this.filteredFiles.length === this.files.length;
                     this.counterclass = this.filteredFiles.length === 0 ? 'red' : (this.ishidden ? 'green': 'yellow');
@@ -322,13 +374,16 @@
                     img = img.substr(0, img.lastIndexOf('.')) + '.jpg';
                     return img;
                 },
+
                 attached: function () {
                     console.info('attached...');
                     var list = document.querySelector('iron-list');
+                    this.listEle = this.$.list;
                     var self = this;
                     var scrollListener = function () {
                         var item= self.filteredFiles[list.firstVisibleIndex];
                         self.scrollLetter = item.substr(item.lastIndexOf('/')+1, 1).trim().toUpperCase();
+                        self.scrollControlVisible = false;
                     };
                     window.addEventListener('scroll', scrollListener);
                 },

@@ -1,0 +1,100 @@
+<html><head><link rel="import" href="../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/effects/waterfall.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-icons/av-icons.html">
+<link rel="import" href="../bower_components/iron-scroll-threshold/iron-scroll-threshold.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../bower_components/iron-flex-layout/classes/iron-flex-layout.html">
+
+
+
+<link rel="import" href="../bower_components/paper-styles/color.html">
+
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+
+
+</head><body><dom-module id="poly-ebook-view">
+    <template>
+
+        <style is="custom-style">:root{--ebooks-green:#00ca8b;--ebooks-red:#fd5d57;--ebooks-yellow:#ffc92a;--primary-text-color:#c6d9f1;--paper-input-container-label:{color:var(--primary-text-color);};--paper-listbox-background-color:#262f3a;--paper-toolbar-background:rgb(43, 54, 67);--paper-toolbar-color:var(--primary-text-color);--paper-input-container-color:#99a6b9;--paper-input-container-focus-color:#408ff9;--paper-input-container-invalid-color:var(--ebooks-red);--paper-input-container-input-color:var(--primary-text-color);--paper-tabs-selection-bar-color:var(--ebooks-yellow);--photo-content-detail :{background:rgba(63, 79, 99, 0.85);};--thumb-link-color:#fff;}:host{display:block;@apply (--paper-font-common-base);}paper-fab.rotated{transform:rotate(-90deg);transform-origin:50% 50%;}#scrollLetterView{--paper-fab-background:var(--paper-light-blue-500);--paper-fab-keyboard-focus-background:var(--paper-light-blue-900);}#scrollLetterView, #dd1, #dd2, #dd3, #dd4{position:fixed;top:50%;right:10px;}#dd1{margin-top:-120px;}#dd2{margin-top:-60px;}#dd3{margin-top:60px;}#dd4{margin-top:120px;}app-header paper-dropdown-menu{margin-left:40px;margin-right:40px;}app-header{position:fixed;top:0;left:0;right:0;z-index:1;background-color:var(--paper-toolbar-background);color:var(--primary-text-color);--app-header-background-front-layer:{background:var(--paper-toolbar-background);};}app-header paper-tabs{margin-right:40px;}span.green{color:var(--ebooks-green);}span.yellow{color:var(--ebooks-yellow);}span.red{color:var(--ebooks-red);}iron-list{margin-top:80px;padding-bottom:20px;}.thumbContent{@apply (--layout);position:relative;margin:0px;}.thumbContent:hover .detail{opacity:1;}.thumbContent > iron-image{@apply (--layout-flex);}.thumbContent > .detail{@apply (--photo-content-detail);position:absolute;bottom:0;left:0;right:0;font-size:18px;font-weight:bold;padding:0;opacity:0;transition:opacity 0.1s;}.thumbContent > .detail > a{color:var(--thumb-link-color);cursor:pointer;text-decoration:inherit;}.self-end{@apply (--layout-self-end);}</style>
+
+        <iron-ajax auto="" url="../init.json" handle-as="json" last-response="{{options}}"></iron-ajax>
+        <iron-ajax auto="" url="{{_getLoadFilesUrl(options.sectionIndex)}}" handle-as="json" last-response="{{files}}"></iron-ajax>
+
+
+        <app-header condenses="" fixed="" effects="blend-background waterfall">
+            <app-toolbar>
+
+                <h4 title="">[[options.title]] (<span class$="{{counterclass}}"><span hidden$="{{ishidden}}">{{filteredFiles.length}} / </span>{{files.length}}</span>)</h4>
+
+                <paper-tabs id="sectionTabs" selected="{{options.sectionIndex}}" class="bottom self-end">
+                    <template is="dom-repeat" items="{{options.sections}}">
+                        <paper-tab>{{item.label}}</paper-tab>
+                    </template>
+                </paper-tabs>
+
+                <paper-input label="Search" value="{{searchText::input}}">
+                    <iron-icon icon="search" prefix=""></iron-icon>
+                    <iron-icon suffix="" hidden$="{{!searchText}}" on-tap="clearInput" icon="clear" alt="clear" title="clear"></iron-icon>
+                </paper-input>
+
+                <paper-dropdown-menu label="Thumb Sizes">
+                    <paper-listbox class="dropdown-content" selected="{{thumbDimsIndex}}">
+                        <template is="dom-repeat" items="{{thumbDims}}">
+                            <paper-item>{{item.width}} x {{item.height}}</paper-item>
+                        </template>
+                    </paper-listbox>
+                </paper-dropdown-menu>
+
+                <paper-icon-button hidden$="{{isFullScreen()}}" icon="fullscreen" on-tap="toggleFullScreen"></paper-icon-button>
+                <paper-icon-button hidden$="{{!isFullScreen()}}" icon="fullscreen-exit" on-tap="toggleFullScreen"></paper-icon-button>
+            </app-toolbar>
+        </app-header>
+
+        <iron-list id="list" items="{{filteredFiles}}" as="file" scroll-target="document" grid="">
+            <template>
+                <div class="thumbContainer">
+                    <div class="thumbContent" style$="{{thumbCss}}" tabindex$="[[tabIndex]]" title="{{index}}) [[_computeTitle(file)]]">
+                        <iron-image sizing="cover" src="[[_computeImgUrl(file)]]"></iron-image>
+
+                        <div class="detail">
+                            <a href="../[[file]]" target="_blank">
+                                <paper-fab icon="cloud-download"></paper-fab>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </iron-list>
+
+
+        <paper-fab id="dd1" hidden$="{{!scrollControlVisible}}" on-click="scroll2Top" icon="av:skip-next" class="rotated"></paper-fab>
+        <paper-fab id="dd2" hidden$="{{!scrollControlVisible}}" on-click="scrollUp" icon="av:fast-forward" class="rotated"></paper-fab>
+
+        <paper-fab id="scrollLetterView" label="[[scrollLetter]]" on-click="openDropdown"></paper-fab>
+
+        <paper-fab id="dd3" hidden$="{{!scrollControlVisible}}" on-click="scrollDown" icon="av:fast-rewind" class="rotated"></paper-fab>
+        <paper-fab id="dd4" hidden$="{{!scrollControlVisible}}" on-click="scroll2End" icon="av:skip-previous" class="rotated"></paper-fab>
+
+    </template>
+
+    <script>HTMLImports.whenReady(function(){Polymer({is:"poly-ebook-view",properties:{options:Object,files:Array,filteredFiles:{type:Array,value:[]},thumbDims:Array,thumbDimsIndex:Number,thumbCss:String,counterclass:{type:String,value:"green"},searchText:{type:String,value:""},ishidden:{type:Boolean,value:!0},scrollControlVisible:{type:Boolean,value:!1},scrollLetter:"",listEle:HTMLElement},observers:["_filterFiles(files, searchText)","_resetBySectionIndex(options.sectionIndex)","_resetByThumbDimsIndex(thumbDimsIndex)"],openDropdown:function(){this.scrollControlVisible=!this.scrollControlVisible},scroll2Top:function(){this.listEle.scrollToIndex(0)},scrollUp:function(){this.listEle.scrollToIndex(this.listEle.firstVisibleIndex-this.filteredFiles.length/20)},scrollDown:function(){this.listEle.scrollToIndex(this.listEle.firstVisibleIndex+this.filteredFiles.length/20)},scroll2End:function(){this.listEle.scrollToIndex(this.filteredFiles.length-1)},clearInput:function(){this.searchText=""},isFullScreen:function(){return!!(document.fullscreenElement||document.mozFullScreenElement||document.webkitFullscreenElement||document.msFullscreenElement)},toggleFullScreen:function(){if(this.isFullScreen())document.exitFullscreen?document.exitFullscreen():document.msExitFullscreen?document.msExitFullscreen():document.mozCancelFullScreen?document.mozCancelFullScreen():document.webkitExitFullscreen&&document.webkitExitFullscreen();else{var e=document.documentElement;e.requestFullscreen?e.requestFullscreen():e.msRequestFullscreen?e.msRequestFullscreen():e.mozRequestFullScreen?e.mozRequestFullScreen():e.webkitRequestFullscreen&&e.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT)}},_resetByThumbDimsIndex:function(e){this.scrollLetter="",this.thumbCss=["width:",this.thumbDims[this.thumbDimsIndex].width,"px;","height:",this.thumbDims[this.thumbDimsIndex].height,"px;"].join(""),document.querySelector("iron-list").fire("iron-resize")},_resetBySectionIndex:function(e){this.scrollLetter="",this.searchText=this.options.sections[e].initialFilter,this.thumbDims=this.options.sections[e].thumbsDims,this.thumbDimsIndex=this.options.sections[e].dimIndex,this._resetByThumbDimsIndex(this.thumbDimsIndex)},_filterFiles:function(e,t){var s,i;this.scrollLetter="";var l=function(e){for(var t=0;t<i.length;t++){var s=i[t];if(s&&s.length>0){var l=s.substr(0,1);if("!"===l||"-"===l){if(s.length>1&&e.toLowerCase().indexOf(s.substr(1))>-1)return!1}else if(-1===e.toLowerCase().indexOf(s))return!1}}return!0};e||(s=null),s||t||(s=e),s||(i=t.toLowerCase().split(" "),s=e.filter(l)),this.scrollControlVisible=!1,this.filteredFiles=s,this.ishidden=this.filteredFiles.length===this.files.length,this.counterclass=0===this.filteredFiles.length?"red":this.ishidden?"green":"yellow",document.querySelector("iron-list").fire("iron-resize")},_getLoadFilesUrl:function(e){return void 0==e?null:"/"+e+"/files.json"},_computeTitle:function(e){return e.substring(1+e.lastIndexOf("/"))},_computeImgUrl:function(e){var t=e.replace("file/","img/");return t=t.substr(0,t.lastIndexOf("."))+".jpg"},attached:function(){console.info("attached...");var e=document.querySelector("iron-list");this.listEle=this.$.list;var t=this,s=function(){var s=t.filteredFiles[e.firstVisibleIndex];t.scrollLetter=s.substr(s.lastIndexOf("/")+1,1).trim().toUpperCase(),t.scrollControlVisible=!1};window.addEventListener("scroll",s)},ready:function(){console.info("ready...")}})});</script>
+
+</dom-module></body></html>
