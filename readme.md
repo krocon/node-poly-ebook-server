@@ -75,7 +75,9 @@ In case of an error have a look at clientRoot: __dirname + '/../client'.
           {width: 420, height: 600}
         ],
         dimIndex: 1,
-        initialFilter: 'krimi'
+        initialFilter: 'krimi -kill',
+        trashDir: '/Users/marc/ebooks/trash',
+        deletable: true
       },
       {
         label: "Comic",

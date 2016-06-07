@@ -76,6 +76,10 @@
                 --paper-fab-background: var(--paper-light-blue-500);
                 --paper-fab-keyboard-focus-background: var(--paper-light-blue-900);
             }
+            .deleteIcon {
+                --paper-fab-background: var(--paper-light-blue-500);
+                --paper-fab-keyboard-focus-background: var(--paper-light-blue-900);
+            }
             #scrollLetterView, #dd1, #dd2, #dd3, #dd4 {
                 position:fixed;top: 50%; right: 10px;
             }
@@ -169,6 +173,7 @@
         <iron-ajax auto url="../init.json" handle-as="json" last-response="{{options}}"></iron-ajax>
         <iron-ajax auto url="{{_getLoadFilesUrl(options.sectionIndex)}}" handle-as="json" last-response="{{files}}"></iron-ajax>
 
+        <iron-ajax id="ajaxDelete" method="DELETE" on-response="refreshAfterDelete"></iron-ajax>
 
         <app-header condenses fixed effects="blend-background waterfall">
             <app-toolbar>
@@ -205,15 +210,18 @@
                     <div class="thumbContent" style$="{{thumbCss}}" tabindex$="[[tabIndex]]" title="{{index}}) [[_computeTitle(file)]]">
                         <iron-image sizing="cover" src="[[_computeImgUrl(file)]]"></iron-image>
 
-                        <div class="detail">
+                        <div class="detail horizontal layout">
                             <a href="../[[file]]" target="_blank">
                                 <paper-fab icon="cloud-download"></paper-fab>
                             </a>
+
+                            <paper-fab icon="delete" class="deleteIcon" on-tap="deleteFile"></paper-fab>
                         </div>
                     </div>
                 </div>
             </template>
         </iron-list>
+
 
 
         <paper-fab id="dd1" hidden$="{{!scrollControlVisible}}" on-click="scroll2Top" icon="av:skip-next" class="rotated"></paper-fab>
@@ -239,6 +247,7 @@
                         type: Array,
                         value: []
                     },
+                    deletable: false,
                     thumbDims: Array,
                     thumbDimsIndex: Number,
                     thumbCss: String,
@@ -259,13 +268,34 @@
                         value: false
                     },
                     scrollLetter: '',
-                    listEle: HTMLElement
+                    listEle: HTMLElement,
+                    actionFile: ''
                 },
                 observers: [
                     '_filterFiles(files, searchText)',
                     '_resetBySectionIndex(options.sectionIndex)',
                     '_resetByThumbDimsIndex(thumbDimsIndex)'
                 ],
+
+                deleteFile: function (event, detail, sender) {
+                    this.actionFile = event.model.file;
+                    var url = event.model.file.replace('file/', 'delete/');
+
+                    if (!confirm('Do you really want to delete ' + url + '?')) return;
+
+                    this.$.ajaxDelete.url = url;
+                    this.$.ajaxDelete.generateRequest();
+                },
+                refreshAfterDelete: function(){
+                    console.info('deleted ', this.actionFile);
+
+                    var i = this.filteredFiles.indexOf(this.actionFile);
+                    if (i > -1) this.filteredFiles.splice(i, 1);
+                    i = this.files.indexOf(this.actionFile);
+                    if (i > -1) this.files.splice(i, 1);
+                    this.listEle.fire('iron-resize');
+
+                },
                 openDropdown: function(){
                     this.scrollControlVisible = !this.scrollControlVisible;
                 },
@@ -323,9 +353,11 @@
                 },
                 _resetBySectionIndex: function(sectionIndex){
                     this.scrollLetter = '';
-                    this.searchText = this.options.sections[sectionIndex].initialFilter;
-                    this.thumbDims = this.options.sections[sectionIndex].thumbsDims;
-                    this.thumbDimsIndex = this.options.sections[sectionIndex].dimIndex;
+                    var section = this.options.sections[sectionIndex];
+                    this.searchText = section.initialFilter;
+                    this.thumbDims = section.thumbsDims;
+                    this.thumbDimsIndex = section.dimIndex;
+                    this.deletable = section.deletable;
                     this._resetByThumbDimsIndex(this.thumbDimsIndex);
                 },
                 _filterFiles: function(files, searchText){
@@ -360,7 +392,7 @@
                     this.filteredFiles = ret;
                     this.ishidden = this.filteredFiles.length === this.files.length;
                     this.counterclass = this.filteredFiles.length === 0 ? 'red' : (this.ishidden ? 'green': 'yellow');
-                    document.querySelector('iron-list').fire('iron-resize');
+                    this.listEle.fire('iron-resize');
                 },
                 _getLoadFilesUrl: function (sectionIndex) {
                     if (sectionIndex==undefined) return null;

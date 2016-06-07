@@ -20,7 +20,9 @@
                     {width: 420, height: 600}
                 ],
                 dimIndex: 1,
-                initialFilter: '-categories krimi'
+                initialFilter: '-tau krimi',
+                trashDir: '/Users/marc/ebooks/trash',
+                deletable: true
             },
             {
                 label: "Comic",
