@@ -1,34 +1,37 @@
-
 <link rel="import" href="../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
-<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
-<link rel="import" href="../bower_components/app-layout/app-scroll-effects/effects/waterfall.html">
 <link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/effects/waterfall.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
 
-<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
-<link rel="import" href="../bower_components/iron-image/iron-image.html">
-<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
-<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../bower_components/iron-icons/av-icons.html">
-<link rel="import" href="../bower_components/iron-scroll-threshold/iron-scroll-threshold.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
-<link rel="import" href="../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../bower_components/iron-flex-layout/classes/iron-flex-layout.html">
-<!--<link rel="import" href="../bower_components/iron-dropdown/iron-dropdown.html">-->
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-icons/av-icons.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/iron-list/iron-list.html">
 
-<!--<link rel="import" href="../bower_components/neon-animation/neon-animations.html">-->
-<link rel="import" href="../bower_components/paper-styles/color.html">
-<!--<link rel="import" href="../bower_components/paper-menu/paper-menu.html">-->
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
-<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
-<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
-<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-styles/color.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+
+
+<!--<link rel="import" href="../bower_components/neon-animation/animations/scale-up-animation.html">-->
+<!--<link rel="import" href="../bower_components/neon-animation/animations/fade-out-animation.html">-->
+<!--<link rel="import" href="../bower_components/neon-animation/animations/fade-in-animation.html">-->
+<!--<link rel="import" href="../bower_components/neon-animation/animations/slide-down-animation.html">-->
+<!--<link rel="import" href="../bower_components/neon-animation/neon-animation-runner-behavior.html">-->
+
 
 
 <dom-module id="poly-ebook-view" >
@@ -82,6 +85,10 @@
             }
             #scrollLetterView, #dd1, #dd2, #dd3, #dd4 {
                 position:fixed;top: 50%; right: 10px;
+            }
+            #dd1, #dd2, #dd3, #dd4 {
+                --paper-fab-background: var(--paper-toolbar-background);
+                --paper-fab-keyboard-focus-background: var(--primary-text-color);
             }
 
             #dd1 {margin-top: -120px;}
@@ -138,6 +145,16 @@
 
             .thumbContent:hover .detail {
                 opacity: 1;
+            }
+
+            .thumbContent .label {
+                background-color: transparent;
+                color: var(--primary-text-color);
+                position: absolute;
+                left: 0;
+                top: 0;
+                /*width:100px;;*/
+                overflow: hidden;
             }
 
             .thumbContent > iron-image {
@@ -208,14 +225,16 @@
             <template>
                 <div class="thumbContainer">
                     <div class="thumbContent" style$="{{thumbCss}}" tabindex$="[[tabIndex]]" title="{{index}}) [[_computeTitle(file)]]">
+
+                        <div class="label">{{getName(file)}}</div>
+
                         <iron-image sizing="cover" src="[[_computeImgUrl(file)]]"></iron-image>
 
                         <div class="detail horizontal layout">
                             <a href="../[[file]]" target="_blank">
-                                <paper-fab icon="cloud-download"></paper-fab>
+                                <paper-fab mini icon="cloud-download"></paper-fab>
                             </a>
-
-                            <paper-fab icon="delete" class="deleteIcon" on-tap="deleteFile"></paper-fab>
+                            <paper-fab mini icon="delete" class="deleteIcon" on-tap="deleteFile"></paper-fab>
                         </div>
                     </div>
                 </div>
@@ -223,14 +242,13 @@
         </iron-list>
 
 
-
-        <paper-fab id="dd1" hidden$="{{!scrollControlVisible}}" on-click="scroll2Top" icon="av:skip-next" class="rotated"></paper-fab>
-        <paper-fab id="dd2" hidden$="{{!scrollControlVisible}}" on-click="scrollUp" icon="av:fast-forward" class="rotated"></paper-fab>
+        <paper-fab  id="dd1" hidden$="{{!scrollControlVisible}}" on-click="scroll2Top" icon="av:skip-next" class="rotated"></paper-fab>
+        <paper-fab  id="dd2" hidden$="{{!scrollControlVisible}}" on-click="scrollUp" icon="av:fast-forward" class="rotated"></paper-fab>
 
         <paper-fab id="scrollLetterView" label="[[scrollLetter]]" on-click="openDropdown"></paper-fab>
 
-        <paper-fab id="dd3" hidden$="{{!scrollControlVisible}}" on-click="scrollDown" icon="av:fast-rewind" class="rotated"></paper-fab>
-        <paper-fab id="dd4" hidden$="{{!scrollControlVisible}}" on-click="scroll2End" icon="av:skip-previous" class="rotated"></paper-fab>
+        <paper-fab  id="dd3" hidden$="{{!scrollControlVisible}}" on-click="scrollDown" icon="av:fast-rewind" class="rotated"></paper-fab>
+        <paper-fab  id="dd4" hidden$="{{!scrollControlVisible}}" on-click="scroll2End" icon="av:skip-previous" class="rotated"></paper-fab>
 
     </template>
 
@@ -239,7 +257,7 @@
 
             Polymer({
                 is: 'poly-ebook-view',
-
+//                behaviors: [Polymer.NeonAnimationRunnerBehavior],
                 properties: {
                     options: Object,
                     files: Array,
@@ -270,13 +288,34 @@
                     scrollLetter: '',
                     listEle: HTMLElement,
                     actionFile: ''
+//                    animationConfig: {
+//                        value: function() {
+//                            return {
+//                                'entry': {
+//                                    name: 'bounce-in-animation',
+//                                    node: this,
+//                                    timing: {duration: 1000}
+//                                },
+//                                'exit': {
+//                                    name: 'fade-out-animation',
+//                                    node: this
+//                                }
+//                            }
+//                        }
+//                    }
                 },
                 observers: [
                     '_filterFiles(files, searchText)',
                     '_resetBySectionIndex(options.sectionIndex)',
                     '_resetByThumbDimsIndex(thumbDimsIndex)'
                 ],
-
+//                listeners: {
+//                    'neon-animation-finish': '_onNeonAnimationFinish'
+//                },
+                getName: function(file){
+                    var i = Math.max(file.lastIndexOf('\\'), file.lastIndexOf('/')) +1;
+                    return file.substr(i);
+                },
                 deleteFile: function (event, detail, sender) {
                     this.actionFile = event.model.file;
                     var url = event.model.file.replace('file/', 'delete/');
@@ -298,15 +337,20 @@
                 },
                 openDropdown: function(){
                     this.scrollControlVisible = !this.scrollControlVisible;
+//                    if (this.scrollControlVisible) {
+//                        this.show();
+//                    } else {
+//                        this.hide();
+//                    }
                 },
                 scroll2Top: function(){
                     this.listEle.scrollToIndex(0);
                 },
                 scrollUp: function(){
-                    this.listEle.scrollToIndex(this.listEle.firstVisibleIndex - this.filteredFiles.length/20);
+                    this.listEle.scrollToIndex(Math.round(this.listEle.firstVisibleIndex - this.filteredFiles.length/10));
                 },
                 scrollDown: function(){
-                    this.listEle.scrollToIndex(this.listEle.firstVisibleIndex + this.filteredFiles.length/20);
+                    this.listEle.scrollToIndex(Math.round(this.listEle.firstVisibleIndex + this.filteredFiles.length/10));
                 },
                 scroll2End: function(){
                     this.listEle.scrollToIndex(this.filteredFiles.length - 1);
@@ -389,6 +433,8 @@
                         ret = files.filter(isOk);
                     }
                     this.scrollControlVisible = false;
+                    //this.hide();
+
                     this.filteredFiles = ret;
                     this.ishidden = this.filteredFiles.length === this.files.length;
                     this.counterclass = this.filteredFiles.length === 0 ? 'red' : (this.ishidden ? 'green': 'yellow');
@@ -407,15 +453,41 @@
                     return img;
                 },
 
+
+//                show: function() {
+//                    this.scrollControlVisible = true;
+//                    //this.style.display = 'inline-block';
+//                    this.$.dd1.style.display = 'inline-block';
+//                    this.$.dd2.style.display = 'inline-block';
+//                    this.$.dd3.style.display = 'inline-block';
+//                    this.$.dd4.style.display = 'inline-block';
+//                    this.cancelAnimation();
+//                    this.playAnimation('entry');
+//                },
+//                hide: function() {
+//                    this.scrollControlVisible = false;
+//                    this.cancelAnimation();
+//                    this.playAnimation('exit');
+//                },
+//                _onNeonAnimationFinish: function() {
+//                    if (!this.scrollControlVisible) {
+//                        this.$.dd1.style.display = 'none';
+//                        this.$.dd2.style.display = 'none';
+//                        this.$.dd3.style.display = 'none';
+//                        this.$.dd4.style.display = 'none';
+//                    }
+//                },
+
                 attached: function () {
                     console.info('attached...');
                     var list = document.querySelector('iron-list');
                     this.listEle = this.$.list;
                     var self = this;
+//                    this.hide();
                     var scrollListener = function () {
                         var item= self.filteredFiles[list.firstVisibleIndex];
                         self.scrollLetter = item.substr(item.lastIndexOf('/')+1, 1).trim().toUpperCase();
-                        self.scrollControlVisible = false;
+                        //self.scrollControlVisible = false;
                     };
                     window.addEventListener('scroll', scrollListener);
                 },
