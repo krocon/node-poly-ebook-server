@@ -24,6 +24,7 @@
 <link rel="import" href="../bower_components/paper-styles/color.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 
 
 <!--<link rel="import" href="../bower_components/neon-animation/animations/scale-up-animation.html">-->
@@ -174,10 +175,14 @@
                 transition: opacity 0.1s;
             }
 
-            .thumbContent > .detail > a {
+            .thumbContent > .detail > a, .thumbContent > .detail > .blue {
                 color: var(--thumb-link-color);
                 cursor: pointer;
                 text-decoration: inherit;
+            }
+            paper-fab.blue {
+                --paper-fab-background: var(--paper-light-blue-500);
+                --paper-fab-keyboard-focus-background: var(--paper-light-blue-900);
             }
 
             .self-end {
@@ -190,7 +195,10 @@
         <iron-ajax auto url="../init.json" handle-as="json" last-response="{{options}}"></iron-ajax>
         <iron-ajax auto url="{{_getLoadFilesUrl(options.sectionIndex)}}" handle-as="json" last-response="{{files}}"></iron-ajax>
 
-        <iron-ajax id="ajaxDelete" method="DELETE" on-response="refreshAfterDelete"></iron-ajax>
+        <iron-ajax id="ajaxDelete" method="DELETE" on-response="afterDelete"></iron-ajax>
+        <iron-ajax id="ajaxCopy" method="GET" on-response="afterCopy"></iron-ajax>
+
+        <paper-toast id="toastCopied" text="File copied successfully."></paper-toast>
 
         <app-header condenses fixed effects="blend-background waterfall">
             <app-toolbar>
@@ -234,7 +242,8 @@
                             <a href="../[[file]]" target="_blank">
                                 <paper-fab mini icon="cloud-download"></paper-fab>
                             </a>
-                            <paper-fab mini icon="delete" class="deleteIcon" on-tap="deleteFile"></paper-fab>
+                            <paper-fab mini hidden$="deleteVisible" icon="delete" class="deleteIcon" on-tap="deleteFile"></paper-fab>
+                            <paper-fab mini hidden$="copyVisible" icon="content-copy" class="blue copyIcon" on-tap="copyFile"></paper-fab>
                         </div>
                     </div>
                 </div>
@@ -265,7 +274,14 @@
                         type: Array,
                         value: []
                     },
-                    deletable: false,
+                    deleteVisible: {
+                        type: Boolean,
+                        value: false
+                    },
+                    copyVisible: {
+                        type: Boolean,
+                        value: false
+                    },
                     thumbDims: Array,
                     thumbDimsIndex: Number,
                     thumbCss: String,
@@ -325,7 +341,7 @@
                     this.$.ajaxDelete.url = url;
                     this.$.ajaxDelete.generateRequest();
                 },
-                refreshAfterDelete: function(){
+                afterDelete: function(){
                     console.info('deleted ', this.actionFile);
 
                     var i = this.filteredFiles.indexOf(this.actionFile);
@@ -333,8 +349,19 @@
                     i = this.files.indexOf(this.actionFile);
                     if (i > -1) this.files.splice(i, 1);
                     this.listEle.fire('iron-resize');
-
                 },
+                copyFile: function (event, detail, sender) {
+                    this.actionFile = event.model.file;
+                    var url = event.model.file.replace('file/', 'copy/');
+                    //if (!confirm('Do you really want to copy ' + url + '?')) return;
+                    this.$.ajaxCopy.url = url;
+                    this.$.ajaxCopy.generateRequest();
+                },
+                afterCopy: function(){
+                    console.log('############');
+                    this.$.toastCopied.open();
+                },
+
                 openDropdown: function(){
                     this.scrollControlVisible = !this.scrollControlVisible;
 //                    if (this.scrollControlVisible) {
@@ -401,7 +428,8 @@
                     this.searchText = section.initialFilter;
                     this.thumbDims = section.thumbsDims;
                     this.thumbDimsIndex = section.dimIndex;
-                    this.deletable = section.deletable;
+                    this.deleteVisible = !!section.trashDir;
+                    this.copyVisible = !!section.copyDir;
                     this._resetByThumbDimsIndex(this.thumbDimsIndex);
                 },
                 _filterFiles: function(files, searchText){

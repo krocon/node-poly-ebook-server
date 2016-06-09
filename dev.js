@@ -21,8 +21,8 @@
                 ],
                 dimIndex: 1,
                 initialFilter: '-tau krimi',
-                trashDir: '/Users/marc/ebooks/trash',
-                deletable: true
+                trashDir: '/Users/marc/ebooks/trash', // if trashDir is defined, a delete button will be displayed.
+                copyDir : '/Volumes/KOBOeReader' // tested with Kobo Aura H2O. Reader must be connected via USB.
             },
             {
                 label: "Comic",
