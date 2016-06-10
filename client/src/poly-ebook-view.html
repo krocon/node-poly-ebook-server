@@ -189,16 +189,19 @@
                 /* This mixin (from iron-flex-layout) aligns the tabs to the bottom of the toolbar. */
                 @apply(--layout-self-end);
             }
-
+            #toastSuccess {
+                --paper-toast-background-color: var(--ebooks-yellow);
+                --paper-toast-color: var(--paper-listbox-background-color);
+            }
         </style>
 
         <iron-ajax auto url="../init.json" handle-as="json" last-response="{{options}}"></iron-ajax>
         <iron-ajax auto url="{{_getLoadFilesUrl(options.sectionIndex)}}" handle-as="json" last-response="{{files}}"></iron-ajax>
 
         <iron-ajax id="ajaxDelete" method="DELETE" on-response="afterDelete"></iron-ajax>
-        <iron-ajax id="ajaxCopy" method="GET" on-response="afterCopy"></iron-ajax>
+        <iron-ajax id="ajaxGet" method="GET" on-response="onAjaxGetResponse"></iron-ajax>
 
-        <paper-toast id="toastCopied" text="File copied successfully."></paper-toast>
+        <paper-toast id="toastSuccess" class="fit-bottom"  text="[[toastSuccessText]]"></paper-toast>
 
         <app-header condenses fixed effects="blend-background waterfall">
             <app-toolbar>
@@ -242,8 +245,10 @@
                             <a href="../[[file]]" target="_blank">
                                 <paper-fab mini icon="cloud-download"></paper-fab>
                             </a>
-                            <paper-fab mini hidden$="deleteVisible" icon="delete" class="deleteIcon" on-tap="deleteFile"></paper-fab>
-                            <paper-fab mini hidden$="copyVisible" icon="content-copy" class="blue copyIcon" on-tap="copyFile"></paper-fab>
+                            <paper-fab mini hidden$="{{!deleteVisible}}" icon="delete" class="deleteIcon" on-tap="deleteFile"></paper-fab>
+                            <paper-fab mini hidden$="{{!copyVisible}}" icon="content-copy" class="blue copyIcon" on-tap="copyFile"></paper-fab>
+                            <paper-fab mini hidden$="{{!sendLinkVisible}}" icon="send" class="blue" on-tap="sendLink"></paper-fab>
+                            <paper-fab mini hidden$="{{!sendAttachmentVisible}}" icon="attachment" class="blue copyIcon" on-tap="sendAttachment"></paper-fab>
                         </div>
                     </div>
                 </div>
@@ -270,6 +275,7 @@
                 properties: {
                     options: Object,
                     files: Array,
+                    toastSuccessText: 'File copied successfully.',
                     filteredFiles: {
                         type: Array,
                         value: []
@@ -279,6 +285,14 @@
                         value: false
                     },
                     copyVisible: {
+                        type: Boolean,
+                        value: false
+                    },
+                    sendLinkVisible: {
+                        type: Boolean,
+                        value: false
+                    },
+                    sendAttachmentVisible: {
                         type: Boolean,
                         value: false
                     },
@@ -354,12 +368,41 @@
                     this.actionFile = event.model.file;
                     var url = event.model.file.replace('file/', 'copy/');
                     //if (!confirm('Do you really want to copy ' + url + '?')) return;
-                    this.$.ajaxCopy.url = url;
-                    this.$.ajaxCopy.generateRequest();
+                    this.$.ajaxGet.url = url;
+                    this.onAjaxGetResponse = this.afterCopy;
+                    this.$.ajaxGet.generateRequest();
                 },
+                sendAttachment: function (event, detail, sender) {
+                    this.actionFile = event.model.file;
+                    var url = event.model.file.replace('file/', 'sendattachment/');
+                    //if (!confirm('Do you really want to copy ' + url + '?')) return;
+                    this.$.ajaxGet.url = url;
+                    this.onAjaxGetResponse = this.afterSendAttachment;
+                    this.$.ajaxGet.generateRequest();
+                },
+                sendLink: function (event, detail, sender) {
+                    this.actionFile = event.model.file;
+                    var url = event.model.file.replace('file/', 'sendlink/');
+                    //if (!confirm('Do you really want to copy ' + url + '?')) return;
+                    this.$.ajaxGet.url = url;
+                    this.onAjaxGetResponse = this.afterSendLink;
+                    this.$.ajaxGet.generateRequest();
+                },
+                onAjaxGetResponse: function(){},
                 afterCopy: function(){
-                    console.log('############');
-                    this.$.toastCopied.open();
+                    console.log('afterCopy');
+                    this.toastSuccessText = 'File copied successfully.';
+                    this.$.toastSuccess.open();
+                },
+                afterSendAttachment: function(){
+                    console.log('afterSendAttachment');
+                    this.toastSuccessText = 'Sent attachment successfully.';
+                    this.$.toastSuccess.open();
+                },
+                afterSendLink: function(){
+                    console.log('afterSendLink');
+                    this.toastSuccessText = 'Sent link successfully.';
+                    this.$.toastSuccess.open();
                 },
 
                 openDropdown: function(){
@@ -430,6 +473,8 @@
                     this.thumbDimsIndex = section.dimIndex;
                     this.deleteVisible = !!section.trashDir;
                     this.copyVisible = !!section.copyDir;
+                    this.sendLinkVisible = !!(section.sendOptions && section.sendOptions.sendlink);
+                    this.sendAttachmentVisible = !!(section.sendOptions && section.sendOptions.sendattachment);
                     this._resetByThumbDimsIndex(this.thumbDimsIndex);
                 },
                 _filterFiles: function(files, searchText){

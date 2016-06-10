@@ -77,7 +77,23 @@ In case of an error have a look at clientRoot: __dirname + '/../client'.
         dimIndex: 1,
         initialFilter: 'krimi -kill',
         trashDir: '/Users/marc/ebooks/trash', // if trashDir is defined, a delete button will be displayed.
-        copyDir : '/Volumes/KOBOeReader' // tested with Kobo Aura H2O. Reader must be connected via USB.
+        copyDir : '/Volumes/KOBOeReader', // tested with Kobo Aura H2O. Reader must be connected via USB.
+        sendOptions: {
+          sendattachment: {
+            title: 'Send book',
+            transport : 'smtps://USER@gmail.com:PASSW@smtp.gmail.com', // see https://www.npmjs.com/package/nodemailer
+            from: 'ABC@gmail.com',    // sender address
+            to: 'ABC@gmail.com',      // list of receivers
+            subject: 'poly ebook server' // Subject line
+          },
+          sendlink: {
+            title: '@getpocket',
+            transport : 'smtps://USER@gmail.com:PASSW@smtp.gmail.com',
+            from: 'ABC@gmail.com',   // sender address
+            to: 'add@getpocket.com', // list of receivers
+            subject: 'filename'      // Subject line
+          }
+        } // null -> send buttons are hidden
       },
       {
         label: "Comic",
