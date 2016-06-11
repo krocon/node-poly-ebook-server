@@ -34,8 +34,7 @@
 <!--<link rel="import" href="../bower_components/neon-animation/neon-animation-runner-behavior.html">-->
 
 
-
-<dom-module id="poly-ebook-view" >
+<dom-module id="poly-ebook-view">
     <template>
 
         <style is="custom-style">
@@ -60,7 +59,7 @@
                 --paper-input-container-input-color: var(--primary-text-color);
                 --paper-tabs-selection-bar-color: var(--ebooks-yellow);
 
-                --photo-content-detail : {
+                --photo-content-detail: {
                     background: rgba(63, 79, 99, 0.85);
                 };
                 --thumb-link-color: #fff;
@@ -80,24 +79,38 @@
                 --paper-fab-background: var(--paper-light-blue-500);
                 --paper-fab-keyboard-focus-background: var(--paper-light-blue-900);
             }
+
             .deleteIcon {
                 --paper-fab-background: var(--paper-light-blue-500);
                 --paper-fab-keyboard-focus-background: var(--paper-light-blue-900);
             }
+
             #scrollLetterView, #dd1, #dd2, #dd3, #dd4 {
-                position:fixed;top: 50%; right: 10px;
+                position: fixed;
+                top: 50%;
+                right: 10px;
             }
+
             #dd1, #dd2, #dd3, #dd4 {
                 --paper-fab-background: var(--paper-toolbar-background);
                 --paper-fab-keyboard-focus-background: var(--primary-text-color);
             }
 
-            #dd1 {margin-top: -120px;}
-            #dd2 {margin-top: -60px;}
-            #dd3 {margin-top: 60px;}
-            #dd4 {margin-top: 120px;}
+            #dd1 {
+                margin-top: -120px;
+            }
 
+            #dd2 {
+                margin-top: -60px;
+            }
 
+            #dd3 {
+                margin-top: 60px;
+            }
+
+            #dd4 {
+                margin-top: 120px;
+            }
 
             app-header paper-dropdown-menu {
                 margin-left: 40px;
@@ -117,17 +130,18 @@
                 };
             }
 
-
             app-header paper-tabs {
-                margin-right:40px;
+                margin-right: 40px;
             }
 
             span.green {
                 color: var(--ebooks-green);
             }
+
             span.yellow {
                 color: var(--ebooks-yellow);
             }
+
             span.red {
                 color: var(--ebooks-red);
             }
@@ -180,6 +194,7 @@
                 cursor: pointer;
                 text-decoration: inherit;
             }
+
             paper-fab.blue {
                 --paper-fab-background: var(--paper-light-blue-500);
                 --paper-fab-keyboard-focus-background: var(--paper-light-blue-900);
@@ -189,6 +204,7 @@
                 /* This mixin (from iron-flex-layout) aligns the tabs to the bottom of the toolbar. */
                 @apply(--layout-self-end);
             }
+
             #toastSuccess {
                 --paper-toast-background-color: var(--ebooks-yellow);
                 --paper-toast-color: var(--paper-listbox-background-color);
@@ -196,12 +212,12 @@
         </style>
 
         <iron-ajax auto url="../init.json" handle-as="json" last-response="{{options}}"></iron-ajax>
-        <iron-ajax auto url="{{_getLoadFilesUrl(options.sectionIndex)}}" handle-as="json" last-response="{{files}}"></iron-ajax>
+        <iron-ajax auto url="{{_getLoadFilesUrl(options.sectionIndex)}}" handle-as="json" last-response="{{files}}" on-response="calcScrollLetter"></iron-ajax>
 
         <iron-ajax id="ajaxDelete" method="DELETE" on-response="afterDelete"></iron-ajax>
         <iron-ajax id="ajaxGet" method="GET" on-response="onAjaxGetResponse"></iron-ajax>
 
-        <paper-toast id="toastSuccess" class="fit-bottom"  text="[[toastSuccessText]]"></paper-toast>
+        <paper-toast id="toastSuccess" class="fit-bottom" text="[[toastSuccessText]]"></paper-toast>
 
         <app-header condenses fixed effects="blend-background waterfall">
             <app-toolbar>
@@ -255,14 +271,15 @@
             </template>
         </iron-list>
 
+        <div hidden$="{{!scrollLetterVisible}}">
+            <paper-fab id="dd1" hidden$="{{!scrollControlVisible}}" on-click="scroll2Top" icon="av:skip-next" class="rotated"></paper-fab>
+            <paper-fab id="dd2" hidden$="{{!scrollControlVisible}}" on-click="scrollUp" icon="av:fast-forward" class="rotated"></paper-fab>
 
-        <paper-fab  id="dd1" hidden$="{{!scrollControlVisible}}" on-click="scroll2Top" icon="av:skip-next" class="rotated"></paper-fab>
-        <paper-fab  id="dd2" hidden$="{{!scrollControlVisible}}" on-click="scrollUp" icon="av:fast-forward" class="rotated"></paper-fab>
+            <paper-fab id="scrollLetterView" label="[[scrollLetter]]" on-click="openDropdown"></paper-fab>
 
-        <paper-fab id="scrollLetterView" label="[[scrollLetter]]" on-click="openDropdown"></paper-fab>
-
-        <paper-fab  id="dd3" hidden$="{{!scrollControlVisible}}" on-click="scrollDown" icon="av:fast-rewind" class="rotated"></paper-fab>
-        <paper-fab  id="dd4" hidden$="{{!scrollControlVisible}}" on-click="scroll2End" icon="av:skip-previous" class="rotated"></paper-fab>
+            <paper-fab id="dd3" hidden$="{{!scrollControlVisible}}" on-click="scrollDown" icon="av:fast-rewind" class="rotated"></paper-fab>
+            <paper-fab id="dd4" hidden$="{{!scrollControlVisible}}" on-click="scroll2End" icon="av:skip-previous" class="rotated"></paper-fab>
+        </div>
 
     </template>
 
@@ -315,6 +332,10 @@
                         type: Boolean,
                         value: false
                     },
+                    scrollLetterVisible: {
+                        type: Boolean,
+                        value: true
+                    },
                     scrollLetter: '',
                     listEle: HTMLElement,
                     actionFile: ''
@@ -342,8 +363,8 @@
 //                listeners: {
 //                    'neon-animation-finish': '_onNeonAnimationFinish'
 //                },
-                getName: function(file){
-                    var i = Math.max(file.lastIndexOf('\\'), file.lastIndexOf('/')) +1;
+                getName: function (file) {
+                    var i = Math.max(file.lastIndexOf('\\'), file.lastIndexOf('/')) + 1;
                     return file.substr(i);
                 },
                 deleteFile: function (event, detail, sender) {
@@ -355,7 +376,7 @@
                     this.$.ajaxDelete.url = url;
                     this.$.ajaxDelete.generateRequest();
                 },
-                afterDelete: function(){
+                afterDelete: function () {
                     console.info('deleted ', this.actionFile);
 
                     var i = this.filteredFiles.indexOf(this.actionFile);
@@ -388,24 +409,25 @@
                     this.onAjaxGetResponse = this.afterSendLink;
                     this.$.ajaxGet.generateRequest();
                 },
-                onAjaxGetResponse: function(){},
-                afterCopy: function(){
+                onAjaxGetResponse: function () {
+                },
+                afterCopy: function () {
                     console.log('afterCopy');
                     this.toastSuccessText = 'File copied successfully.';
                     this.$.toastSuccess.open();
                 },
-                afterSendAttachment: function(){
+                afterSendAttachment: function () {
                     console.log('afterSendAttachment');
                     this.toastSuccessText = 'Sent attachment successfully.';
                     this.$.toastSuccess.open();
                 },
-                afterSendLink: function(){
+                afterSendLink: function () {
                     console.log('afterSendLink');
                     this.toastSuccessText = 'Sent link successfully.';
                     this.$.toastSuccess.open();
                 },
 
-                openDropdown: function(){
+                openDropdown: function () {
                     this.scrollControlVisible = !this.scrollControlVisible;
 //                    if (this.scrollControlVisible) {
 //                        this.show();
@@ -413,19 +435,19 @@
 //                        this.hide();
 //                    }
                 },
-                scroll2Top: function(){
+                scroll2Top: function () {
                     this.listEle.scrollToIndex(0);
                 },
-                scrollUp: function(){
-                    this.listEle.scrollToIndex(Math.round(this.listEle.firstVisibleIndex - this.filteredFiles.length/10));
+                scrollUp: function () {
+                    this.listEle.scrollToIndex(Math.max(0, Math.round(this.listEle.firstVisibleIndex - this.filteredFiles.length / 10)));
                 },
-                scrollDown: function(){
-                    this.listEle.scrollToIndex(Math.round(this.listEle.firstVisibleIndex + this.filteredFiles.length/10));
+                scrollDown: function () {
+                    this.listEle.scrollToIndex(Math.min(this.filteredFiles.length - 1, Math.round(this.listEle.firstVisibleIndex + this.filteredFiles.length / 10)));
                 },
-                scroll2End: function(){
+                scroll2End: function () {
                     this.listEle.scrollToIndex(this.filteredFiles.length - 1);
                 },
-                clearInput: function(){
+                clearInput: function () {
                     this.searchText = '';
                 },
                 isFullScreen: function () {
@@ -457,15 +479,15 @@
                     }
                 },
 
-                _resetByThumbDimsIndex: function(thumbDimsIndex){
+                _resetByThumbDimsIndex: function (thumbDimsIndex) {
                     this.scrollLetter = '';
                     this.thumbCss = [
-                        'width:', this.thumbDims[this.thumbDimsIndex].width,'px;',
+                        'width:', this.thumbDims[this.thumbDimsIndex].width, 'px;',
                         'height:', this.thumbDims[this.thumbDimsIndex].height, 'px;'
                     ].join('');
                     document.querySelector('iron-list').fire('iron-resize');
                 },
-                _resetBySectionIndex: function(sectionIndex){
+                _resetBySectionIndex: function (sectionIndex) {
                     this.scrollLetter = '';
                     var section = this.options.sections[sectionIndex];
                     this.searchText = section.initialFilter;
@@ -477,7 +499,7 @@
                     this.sendAttachmentVisible = !!(section.sendOptions && section.sendOptions.sendattachment);
                     this._resetByThumbDimsIndex(this.thumbDimsIndex);
                 },
-                _filterFiles: function(files, searchText){
+                _filterFiles: function (files, searchText) {
                     var ret;
                     var filterWords;
                     this.scrollLetter = '';
@@ -499,23 +521,24 @@
                     };
 
                     if (!files) ret = null;
-                    if (!ret && !searchText) ret= files;
+                    if (!ret && !searchText) ret = files;
 
                     if (!ret) {
                         filterWords = searchText.toLowerCase().split(' ');
                         ret = files.filter(isOk);
                     }
-                    this.scrollControlVisible = false;
-                    //this.hide();
-
                     this.filteredFiles = ret;
                     this.ishidden = this.filteredFiles.length === this.files.length;
-                    this.counterclass = this.filteredFiles.length === 0 ? 'red' : (this.ishidden ? 'green': 'yellow');
+                    this.counterclass = this.filteredFiles.length === 0 ? 'red' : (this.ishidden ? 'green' : 'yellow');
+
+                    this.scrollControlVisible = false;
+                    this.scrollLetterVisible = this.filteredFiles.length !== 0; // && !(this.listEle.firstVisibleIndex === 0 && this.listEle.lastVisibleIndex === this.filteredFiles.length - 1);
+                    this.calcScrollLetter();
                     this.listEle.fire('iron-resize');
                 },
                 _getLoadFilesUrl: function (sectionIndex) {
-                    if (sectionIndex==undefined) return null;
-                    return '/'+ sectionIndex+'/files.json';
+                    if (sectionIndex == undefined) return null;
+                    return '/' + sectionIndex + '/files.json';
                 },
                 _computeTitle: function (file) {
                     return file.substring(1 + file.lastIndexOf('/'));
@@ -551,18 +574,25 @@
 //                    }
 //                },
 
+                calcScrollLetter: function () {
+                    var item = this.filteredFiles[this.listEle.firstVisibleIndex];
+                    this.scrollLetter = !item ? '' : item.substr(item.lastIndexOf('/') + 1, 1).trim().toUpperCase();
+                },
+
                 attached: function () {
                     console.info('attached...');
                     var list = document.querySelector('iron-list');
                     this.listEle = this.$.list;
+
                     var self = this;
-//                    this.hide();
                     var scrollListener = function () {
-                        var item= self.filteredFiles[list.firstVisibleIndex];
-                        self.scrollLetter = item.substr(item.lastIndexOf('/')+1, 1).trim().toUpperCase();
-                        //self.scrollControlVisible = false;
+                        self.calcScrollLetter();
                     };
-                    window.addEventListener('scroll', scrollListener);
+                    this.calcScrollLetter.bind(this);
+
+                    Polymer.RenderStatus.afterNextRender(this, function () {
+                        window.addEventListener('scroll', scrollListener);
+                    });
                 },
                 ready: function () {
                     console.info('ready...');
