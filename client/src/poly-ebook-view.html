@@ -27,11 +27,8 @@
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 
 
-<!--<link rel="import" href="../bower_components/neon-animation/animations/scale-up-animation.html">-->
-<!--<link rel="import" href="../bower_components/neon-animation/animations/fade-out-animation.html">-->
-<!--<link rel="import" href="../bower_components/neon-animation/animations/fade-in-animation.html">-->
-<!--<link rel="import" href="../bower_components/neon-animation/animations/slide-down-animation.html">-->
-<!--<link rel="import" href="../bower_components/neon-animation/neon-animation-runner-behavior.html">-->
+<link rel="import" href="thumb-div.html">
+<link rel="import" href="toggle-fullscreen-button.html">
 
 
 <dom-module id="poly-ebook-view">
@@ -39,22 +36,22 @@
 
         <style is="custom-style">
             :root {
-                --ebooks-green: #00ca8b;
-                --ebooks-red: #fd5d57;
-                --ebooks-yellow: #ffc92a;
+                --ebooks-green: #98ee9a;
+                --ebooks-red: #fa8577;
+                --ebooks-yellow: #face5c;
 
-                --primary-text-color: #c6d9f1;
+                --primary-text-color: #fff;
 
                 --paper-input-container-label: {
                     color: var(--primary-text-color);
                 };
-                --paper-listbox-background-color: #262f3a;
+                --paper-listbox-background-color: #363b4e;
 
-                --paper-toolbar-background: rgb(43, 54, 67);
+                --paper-toolbar-background: #262831;
                 --paper-toolbar-color: var(--primary-text-color);
 
                 --paper-input-container-color: #99a6b9;
-                --paper-input-container-focus-color: #408ff9;
+                --paper-input-container-focus-color: #4994f6;
                 --paper-input-container-invalid-color: var(--ebooks-red);
                 --paper-input-container-input-color: var(--primary-text-color);
                 --paper-tabs-selection-bar-color: var(--ebooks-yellow);
@@ -151,55 +148,6 @@
                 padding-bottom: 20px;
             }
 
-            .thumbContent {
-                @apply(--layout);
-                /*background-color: var(--paper-toolbar-background);*/
-                position: relative;
-                margin: 0px;
-            }
-
-            .thumbContent:hover .detail {
-                opacity: 1;
-            }
-
-            .thumbContent .label {
-                background-color: transparent;
-                color: var(--primary-text-color);
-                position: absolute;
-                left: 0;
-                top: 0;
-                /*width:100px;;*/
-                overflow: hidden;
-            }
-
-            .thumbContent > iron-image {
-                @apply(--layout-flex);
-            }
-
-            .thumbContent > .detail {
-                @apply(--photo-content-detail);
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                font-size: 18px;
-                font-weight: bold;
-                padding: 0;
-                opacity: 0;
-                transition: opacity 0.1s;
-            }
-
-            .thumbContent > .detail > a, .thumbContent > .detail > .blue {
-                color: var(--thumb-link-color);
-                cursor: pointer;
-                text-decoration: inherit;
-            }
-
-            paper-fab.blue {
-                --paper-fab-background: var(--paper-light-blue-500);
-                --paper-fab-keyboard-focus-background: var(--paper-light-blue-900);
-            }
-
             .self-end {
                 /* This mixin (from iron-flex-layout) aligns the tabs to the bottom of the toolbar. */
                 @apply(--layout-self-end);
@@ -209,20 +157,23 @@
                 --paper-toast-background-color: var(--ebooks-yellow);
                 --paper-toast-color: var(--paper-listbox-background-color);
             }
+            #toastError {
+                --paper-toast-background-color: var(--ebooks-red);
+                --paper-toast-color: var(--thumb-link-color);
+            }
         </style>
 
         <iron-ajax auto url="../init.json" handle-as="json" last-response="{{options}}"></iron-ajax>
-        <iron-ajax auto url="{{_getLoadFilesUrl(options.sectionIndex)}}" handle-as="json" last-response="{{files}}" on-response="calcScrollLetter"></iron-ajax>
-
-        <iron-ajax id="ajaxDelete" method="DELETE" on-response="afterDelete"></iron-ajax>
-        <iron-ajax id="ajaxGet" method="GET" on-response="onAjaxGetResponse"></iron-ajax>
+        <iron-ajax auto url="{{_getLoadFilesUrl(options.sectionIndex)}}" handle-as="json" last-response="{{files}}" on-response="_calcScrollLetter"></iron-ajax>
+        <iron-ajax id="ajaxGet" method="GET" last-response="{{ajaxGetResponse}}"></iron-ajax>
 
         <paper-toast id="toastSuccess" class="fit-bottom" text="[[toastSuccessText]]"></paper-toast>
+        <paper-toast id="toastError" class="fit-bottom" text="[[toastErrorText]]"></paper-toast>
 
         <app-header condenses fixed effects="blend-background waterfall">
             <app-toolbar>
 
-                <h4 title>[[options.title]] (<span class$="{{counterclass}}"><span hidden$="{{ishidden}}">{{filteredFiles.length}} / </span>{{files.length}}</span>)</h4>
+                <h4 title>[[options.title]] (<span class$="{{counterclass}}"><span hidden$="{{itemCounterHidden}}">{{filteredFiles.length}} / </span>{{files.length}}</span>)</h4>
 
                 <paper-tabs id="sectionTabs" selected="{{options.sectionIndex}}" class="bottom self-end">
                     <template is="dom-repeat" items="{{options.sections}}">
@@ -243,32 +194,23 @@
                     </paper-listbox>
                 </paper-dropdown-menu>
 
-                <paper-icon-button hidden$="{{isFullScreen()}}" icon="fullscreen" on-tap="toggleFullScreen"></paper-icon-button>
-                <paper-icon-button hidden$="{{!isFullScreen()}}" icon="fullscreen-exit" on-tap="toggleFullScreen"></paper-icon-button>
+                <toggle-fullscreen-button></toggle-fullscreen-button>
             </app-toolbar>
         </app-header>
 
         <iron-list id="list" items="{{filteredFiles}}" as="file" scroll-target="document" grid>
             <template>
-                <div class="thumbContainer">
-                    <div class="thumbContent" style$="{{thumbCss}}" tabindex$="[[tabIndex]]" title="{{index}}) [[_computeTitle(file)]]">
-
-                        <div class="label">{{getName(file)}}</div>
-
-                        <iron-image sizing="cover" src="[[_computeImgUrl(file)]]"></iron-image>
-
-                        <div class="detail horizontal layout">
-                            <a href="../[[file]]" target="_blank">
-                                <paper-fab mini icon="cloud-download"></paper-fab>
-                            </a>
-                            <paper-fab mini hidden$="{{!deleteVisible}}" icon="delete" class="deleteIcon" on-tap="deleteFile"></paper-fab>
-                            <paper-fab mini hidden$="{{!copyVisible}}" icon="content-copy" class="blue copyIcon" on-tap="copyFile"></paper-fab>
-                            <paper-fab mini hidden$="{{!sendLinkVisible}}" icon="send" class="blue" on-tap="sendLink"></paper-fab>
-                            <paper-fab mini hidden$="{{!sendAttachmentVisible}}" icon="attachment" class="blue copyIcon" on-tap="sendAttachment"></paper-fab>
-                        </div>
-                    </div>
-                </div>
+                <thumb-div
+                        file="[[file]]"
+                        thumb-css="[[thumbCss]]"
+                        tab-index="[[tabIndex]]"
+                        index="[[index]]"
+                        delete-visible="[[deleteVisible]]"
+                        copy-visible="[[copyVisible]]"
+                        sendLink-visible="[[sendLinkVisible]]"
+                        sendAttachment-visible="[[sendAttachmentVisible]]"></thumb-div>
             </template>
+
         </iron-list>
 
         <div hidden$="{{!scrollLetterVisible}}">
@@ -288,11 +230,11 @@
 
             Polymer({
                 is: 'poly-ebook-view',
-//                behaviors: [Polymer.NeonAnimationRunnerBehavior],
                 properties: {
                     options: Object,
                     files: Array,
                     toastSuccessText: 'File copied successfully.',
+                    toastErrorText: '',
                     filteredFiles: {
                         type: Array,
                         value: []
@@ -315,7 +257,9 @@
                     },
                     thumbDims: Array,
                     thumbDimsIndex: Number,
-                    thumbCss: String,
+                    thumbCss: {
+                        type: String
+                    },
                     counterclass: {
                         type: String,
                         value: 'green'
@@ -324,7 +268,7 @@
                         type: String,
                         value: ''
                     },
-                    ishidden: {
+                    itemCounterHidden: {
                         type: Boolean,
                         value: true
                     },
@@ -338,102 +282,41 @@
                     },
                     scrollLetter: '',
                     listEle: HTMLElement,
-                    actionFile: ''
-//                    animationConfig: {
-//                        value: function() {
-//                            return {
-//                                'entry': {
-//                                    name: 'bounce-in-animation',
-//                                    node: this,
-//                                    timing: {duration: 1000}
-//                                },
-//                                'exit': {
-//                                    name: 'fade-out-animation',
-//                                    node: this
-//                                }
-//                            }
-//                        }
-//                    }
+                    ajaxGetResponse: Object
                 },
                 observers: [
                     '_filterFiles(files, searchText)',
                     '_resetBySectionIndex(options.sectionIndex)',
-                    '_resetByThumbDimsIndex(thumbDimsIndex)'
+                    '_resetByThumbDimsIndex(thumbDimsIndex)',
+                    'onActionResponse(ajaxGetResponse)'
                 ],
-//                listeners: {
-//                    'neon-animation-finish': '_onNeonAnimationFinish'
-//                },
-                getName: function (file) {
-                    var i = Math.max(file.lastIndexOf('\\'), file.lastIndexOf('/')) + 1;
-                    return file.substr(i);
-                },
-                deleteFile: function (event, detail, sender) {
-                    this.actionFile = event.model.file;
-                    var url = event.model.file.replace('file/', 'delete/');
 
-                    if (!confirm('Do you really want to delete ' + url + '?')) return;
+                onActionResponse: function (response) {
+                    if (!response) return;
 
-                    this.$.ajaxDelete.url = url;
-                    this.$.ajaxDelete.generateRequest();
-                },
-                afterDelete: function () {
-                    console.info('deleted ', this.actionFile);
-
-                    var i = this.filteredFiles.indexOf(this.actionFile);
-                    if (i > -1) this.filteredFiles.splice(i, 1);
-                    i = this.files.indexOf(this.actionFile);
-                    if (i > -1) this.files.splice(i, 1);
-                    this.listEle.fire('iron-resize');
-                },
-                copyFile: function (event, detail, sender) {
-                    this.actionFile = event.model.file;
-                    var url = event.model.file.replace('file/', 'copy/');
-                    //if (!confirm('Do you really want to copy ' + url + '?')) return;
-                    this.$.ajaxGet.url = url;
-                    this.onAjaxGetResponse = this.afterCopy;
-                    this.$.ajaxGet.generateRequest();
-                },
-                sendAttachment: function (event, detail, sender) {
-                    this.actionFile = event.model.file;
-                    var url = event.model.file.replace('file/', 'sendattachment/');
-                    //if (!confirm('Do you really want to copy ' + url + '?')) return;
-                    this.$.ajaxGet.url = url;
-                    this.onAjaxGetResponse = this.afterSendAttachment;
-                    this.$.ajaxGet.generateRequest();
-                },
-                sendLink: function (event, detail, sender) {
-                    this.actionFile = event.model.file;
-                    var url = event.model.file.replace('file/', 'sendlink/');
-                    //if (!confirm('Do you really want to copy ' + url + '?')) return;
-                    this.$.ajaxGet.url = url;
-                    this.onAjaxGetResponse = this.afterSendLink;
-                    this.$.ajaxGet.generateRequest();
-                },
-                onAjaxGetResponse: function () {
-                },
-                afterCopy: function () {
-                    console.log('afterCopy');
-                    this.toastSuccessText = 'File copied successfully.';
-                    this.$.toastSuccess.open();
-                },
-                afterSendAttachment: function () {
-                    console.log('afterSendAttachment');
-                    this.toastSuccessText = 'Sent attachment successfully.';
-                    this.$.toastSuccess.open();
-                },
-                afterSendLink: function () {
-                    console.log('afterSendLink');
-                    this.toastSuccessText = 'Sent link successfully.';
-                    this.$.toastSuccess.open();
+                    var file = response.file;
+                    if (response.error) {
+                        this.toastErrorText = response.msg;
+                        this.$.toastError.open();
+                    } else {
+                        // Success:
+                        console.info('response.method === delete:', response.method === 'delete');
+                        if (response.method === 'delete') {
+                            var f = this.options.sectionIndex + '/file'+ file;
+                            var i = this.filteredFiles.indexOf(f);
+                            if (i > -1) this.filteredFiles.splice(i, 1);
+                            i = this.files.indexOf(f);
+                            if (i > -1) this.files.splice(i, 1);
+                            this.listEle.fire('iron-resize');
+                        } else {
+                            this.toastSuccessText = response.msg;
+                            this.$.toastSuccess.open();
+                        }
+                    }
                 },
 
                 openDropdown: function () {
                     this.scrollControlVisible = !this.scrollControlVisible;
-//                    if (this.scrollControlVisible) {
-//                        this.show();
-//                    } else {
-//                        this.hide();
-//                    }
                 },
                 scroll2Top: function () {
                     this.listEle.scrollToIndex(0);
@@ -449,34 +332,6 @@
                 },
                 clearInput: function () {
                     this.searchText = '';
-                },
-                isFullScreen: function () {
-                    return !(!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement);
-                },
-                toggleFullScreen: function () {
-                    // https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API
-                    if (!this.isFullScreen()) {
-                        var documentElement = document.documentElement;
-                        if (documentElement.requestFullscreen) {
-                            documentElement.requestFullscreen();
-                        } else if (documentElement.msRequestFullscreen) {
-                            documentElement.msRequestFullscreen();
-                        } else if (documentElement.mozRequestFullScreen) {
-                            documentElement.mozRequestFullScreen();
-                        } else if (documentElement.webkitRequestFullscreen) {
-                            documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-                        }
-                    } else {
-                        if (document.exitFullscreen) {
-                            document.exitFullscreen();
-                        } else if (document.msExitFullscreen) {
-                            document.msExitFullscreen();
-                        } else if (document.mozCancelFullScreen) {
-                            document.mozCancelFullScreen();
-                        } else if (document.webkitExitFullscreen) {
-                            document.webkitExitFullscreen();
-                        }
-                    }
                 },
 
                 _resetByThumbDimsIndex: function (thumbDimsIndex) {
@@ -528,79 +383,53 @@
                         ret = files.filter(isOk);
                     }
                     this.filteredFiles = ret;
-                    this.ishidden = this.filteredFiles.length === this.files.length;
-                    this.counterclass = this.filteredFiles.length === 0 ? 'red' : (this.ishidden ? 'green' : 'yellow');
+                    this.itemCounterHidden = this.filteredFiles.length === this.files.length;
+                    this.counterclass = this.filteredFiles.length === 0 ? 'red' : (this.itemCounterHidden ? 'green' : 'yellow');
 
                     this.scrollControlVisible = false;
                     this.scrollLetterVisible = this.filteredFiles.length !== 0; // && !(this.listEle.firstVisibleIndex === 0 && this.listEle.lastVisibleIndex === this.filteredFiles.length - 1);
-                    this.calcScrollLetter();
+                    this._calcScrollLetter();
                     this.listEle.fire('iron-resize');
                 },
                 _getLoadFilesUrl: function (sectionIndex) {
                     if (sectionIndex == undefined) return null;
                     return '/' + sectionIndex + '/files.json';
                 },
-                _computeTitle: function (file) {
-                    return file.substring(1 + file.lastIndexOf('/'));
-                },
-                _computeImgUrl: function (file) {
-                    var img = file.replace('file/', 'img/');
-                    img = img.substr(0, img.lastIndexOf('.')) + '.jpg';
-                    return img;
-                },
 
-
-//                show: function() {
-//                    this.scrollControlVisible = true;
-//                    //this.style.display = 'inline-block';
-//                    this.$.dd1.style.display = 'inline-block';
-//                    this.$.dd2.style.display = 'inline-block';
-//                    this.$.dd3.style.display = 'inline-block';
-//                    this.$.dd4.style.display = 'inline-block';
-//                    this.cancelAnimation();
-//                    this.playAnimation('entry');
-//                },
-//                hide: function() {
-//                    this.scrollControlVisible = false;
-//                    this.cancelAnimation();
-//                    this.playAnimation('exit');
-//                },
-//                _onNeonAnimationFinish: function() {
-//                    if (!this.scrollControlVisible) {
-//                        this.$.dd1.style.display = 'none';
-//                        this.$.dd2.style.display = 'none';
-//                        this.$.dd3.style.display = 'none';
-//                        this.$.dd4.style.display = 'none';
-//                    }
-//                },
-
-                calcScrollLetter: function () {
+                _calcScrollLetter: function () {
                     var item = this.filteredFiles[this.listEle.firstVisibleIndex];
-                    this.scrollLetter = !item ? '' : item.substr(item.lastIndexOf('/') + 1, 1).trim().toUpperCase();
+                    var idx = Math.max(item.lastIndexOf('/'), item.lastIndexOf('\\'));
+                    this.scrollLetter = !item ? '' : item.substr(idx + 1, 1).trim().toUpperCase();
                 },
 
+                // Element Lifecycle:
                 attached: function () {
                     console.info('attached...');
-                    var list = document.querySelector('iron-list');
+
                     this.listEle = this.$.list;
 
                     var self = this;
                     var scrollListener = function () {
-                        self.calcScrollLetter();
+                        self._calcScrollLetter();
                     };
-                    this.calcScrollLetter.bind(this);
+                    this._calcScrollLetter.bind(this);
 
                     Polymer.RenderStatus.afterNextRender(this, function () {
                         window.addEventListener('scroll', scrollListener);
+
+                        self.addEventListener('thumb-div-action', function(event){
+                            var detail = event.detail;
+                            var file = detail.file;
+                            if (detail.method !== 'delete' || confirm('Do you really want to delete ' + file + '?')) {
+                                self.$.ajaxGet.url = file.replace(/file[/|\\]/, detail.method + '/');
+                                self.$.ajaxGet.generateRequest();
+                            }
+                        });
                     });
                 },
-                ready: function () {
-                    console.info('ready...');
-                }
+                ready: function () {}
             });
-
         });
-
     </script>
 
 </dom-module>

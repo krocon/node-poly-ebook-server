@@ -1,0 +1,48 @@
+<script>
+    FullScreenBehavior = {
+
+        properties: {
+            fullScreen: {
+                type: Boolean,
+                value: false,
+                notify: true,
+                observer: 'isFullScreen'
+            }
+        },
+
+        isFullScreen: function () {
+            return !(
+            !document.fullscreenElement &&
+            !document.mozFullScreenElement &&
+            !document.webkitFullscreenElement &&
+            !document.msFullscreenElement);
+        },
+        toggleFullScreen: function () {
+            // https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API
+            if (!this.isFullScreen()) {
+                var documentElement = document.documentElement;
+                if (documentElement.requestFullscreen) {
+                    documentElement.requestFullscreen();
+                } else if (documentElement.msRequestFullscreen) {
+                    documentElement.msRequestFullscreen();
+                } else if (documentElement.mozRequestFullScreen) {
+                    documentElement.mozRequestFullScreen();
+                } else if (documentElement.webkitRequestFullscreen) {
+                    documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+                }
+                this.fullScreen = true;
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+                this.fullScreen = false;
+            }
+        }
+    };
+</script>

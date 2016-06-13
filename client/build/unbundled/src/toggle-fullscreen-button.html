@@ -1,0 +1,13 @@
+<html><head><link rel="import" href="../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="full-screen-behavior.html">
+
+</head><body><dom-module id="toggle-fullscreen-button">
+    <template>
+        <paper-icon-button hidden$="{{fullScreen}}" icon="fullscreen" on-tap="toggleFullScreen"></paper-icon-button>
+        <paper-icon-button hidden$="{{!fullScreen}}" icon="fullscreen-exit" on-tap="toggleFullScreen"></paper-icon-button>
+    </template>
+
+    <script>HTMLImports.whenReady(function(){Polymer({is:"toggle-fullscreen-button",behaviors:[FullScreenBehavior]})});</script>
+</dom-module></body></html>

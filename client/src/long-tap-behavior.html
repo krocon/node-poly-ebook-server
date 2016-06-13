@@ -1,0 +1,38 @@
+<script>
+    LongTapBehavior = {
+
+        properties: {
+            delay: {
+                type: Number,
+                value: 1000,
+                notify: true
+            },
+            time: {
+                type: Number,
+                value: 0
+            },
+            _event : 0,
+            _detail : 0,
+            _sender :0
+        },
+
+        listeners: {
+            'up': '_up',
+            'down': '_down'
+        },
+
+        _down: function(event, detail, sender) {
+            this.time = Date.now();
+            //console.info('#', event);
+            this._event = event;
+            this._detail = detail;
+            this._sender = sender;
+        },
+
+        _up: function(event, detail, sender) {
+            if (Date.now() - this.time > 1000) {
+                this.fire('longtap', this._event, this._detail, this._sender);
+            }
+        }
+    };
+</script>

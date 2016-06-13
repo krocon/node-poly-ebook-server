@@ -22,7 +22,8 @@
                 dimIndex: 1,
                 initialFilter: '-tau krimi',
                 trashDir: '/Users/marc/ebooks/trash', // if trashDir is defined, a delete button will be displayed.
-                copyDir : '/Volumes/KOBOeReader', // tested with Kobo Aura H2O. Reader must be connected via USB.
+                // copyDir : '/Volumes/KOBOeReader', // tested with Kobo Aura H2O. Reader must be connected via USB.
+                copyDir : '/Users/marc/ebooks/copy', // tested with Kobo Aura H2O. Reader must be connected via USB.
                 sendOptions: {
                     sendattachment: {
                         title: 'Send book',
@@ -57,6 +58,7 @@
                 label: "Magazine",
                 bookExtensions: ['.pdf'],
                 baseDir: "/Volumes/2TB/jdownload/_magazine",
+                trashDir: '/Volumes/2TB/jdownload',
                 thumbsDims: [
                     {width: 105, height: 150},
                     {width: 210, height: 300},

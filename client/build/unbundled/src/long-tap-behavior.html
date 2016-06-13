@@ -1,0 +1,2 @@
+<html><head><script>LongTapBehavior={properties:{delay:{type:Number,value:1e3,notify:!0},time:{type:Number,value:0},_event:0,_detail:0,_sender:0},listeners:{up:"_up",down:"_down"},_down:function(e,t,i){this.time=Date.now(),this._event=e,this._detail=t,this._sender=i},_up:function(e,t,i){Date.now()-this.time>1e3&&this.fire("longtap",this._event,this._detail,this._sender)}};</script>
+</head><body></body></html>

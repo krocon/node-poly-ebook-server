@@ -1,6 +1,6 @@
 {
   "name": "poly-ebook-server",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "Webserver for own ebook content: comics and epubs (cbr,cbz,cb7,epub, PDF)",
   "keywords": [
     "Cover",
@@ -23,7 +23,7 @@
     "cheerio": "^0.19.0",
     "ebook-cover-generator": "0.0.10",
     "express": "^4.13.3",
-    "fs-extra": "^0.26.3",
+    "fs-extra": "^0.30.0",
     "gm": "^1.21.1",
     "html-entities": "^1.2.0",
     "nodemailer": "^1.11.0",
