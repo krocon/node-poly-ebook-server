@@ -11,7 +11,7 @@ With help of a simple text input one can filter the list of the books.
 
 Technology: Server based on node.js, client based on Google Polymer.
 
-![screen](https://cloud.githubusercontent.com/assets/11378781/15753881/d9912384-28f5-11e6-99bd-c35bdc229398.png)
+![screen](https://cloud.githubusercontent.com/assets/11378781/16016935/b407eef8-319d-11e6-8b8e-4a4fca1f0f35.png)
 
 ## Getting started
 
