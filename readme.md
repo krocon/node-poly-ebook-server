@@ -13,8 +13,14 @@ Technology: Server based on node.js, client based on Google Polymer.
 
 ![screen](https://cloud.githubusercontent.com/assets/11378781/16016935/b407eef8-319d-11e6-8b8e-4a4fca1f0f35.png)
 
-## Getting started
+## Preamble
 
+I use this tool to get an overview to my ebooks. With my iPad and Android tablet I can grabble my hole collection. An ebook is downloaded to the tablet with a simple click.
+In a later version I will integrate an online view, an internet search (to fetch book detail information), a toggle view (groupimg books) and so on. Feel free to give me feedback!
+
+Second reason for coding this is learning Google Polymer [#UseThePlatform](https://www.polymer-project.org).
+
+## Getting started
 
 
 ### ebook-cover-generator

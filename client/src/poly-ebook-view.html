@@ -7,14 +7,16 @@
 
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
-<link rel="import" href="../bower_components/iron-flex-layout/classes/iron-flex-layout.html">
-<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../bower_components/iron-icons/av-icons.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/iron-image/iron-image.html">
 <link rel="import" href="../bower_components/iron-list/iron-list.html">
 
+<link rel="import" href="../bower_components/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../bower_components/neon-animation/animations/fade-out-animation.html">
+
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
@@ -25,10 +27,12 @@
 <link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/paper-menu/paper-menu.html">
 
 
 <link rel="import" href="thumb-div.html">
 <link rel="import" href="toggle-fullscreen-button.html">
+<link rel="import" href="detail-dialog.html">
 
 
 <dom-module id="poly-ebook-view">
@@ -36,16 +40,24 @@
 
         <style is="custom-style">
             :root {
-                --ebooks-green: #98ee9a;
-                --ebooks-red: #fa8577;
+                --ebooks-green: #95c373;
+                --ebooks-red: #e16971;
                 --ebooks-yellow: #face5c;
 
-                --primary-text-color: #fff;
+                --pink-color: #c776df;
+                --blue-color: #6292f0;
+                --white-color: #fff;
+                --fab-text-color: #c8d5ef;
+                --fab-text-hover-color: #fff;
+
+                /* see bower_components\paper-styles\default-theme.html */
+                --primary-text-color: var(--dark-theme-text-color);
+                --primary-background-color: var(--dark-theme-background-color);
 
                 --paper-input-container-label: {
                     color: var(--primary-text-color);
                 };
-                --paper-listbox-background-color: #363b4e;
+                --paper-listbox-background-color: #31343F;
 
                 --paper-toolbar-background: #262831;
                 --paper-toolbar-color: var(--primary-text-color);
@@ -57,29 +69,41 @@
                 --paper-tabs-selection-bar-color: var(--ebooks-yellow);
 
                 --photo-content-detail: {
-                    background: rgba(63, 79, 99, 0.85);
+                    background: transparent;
                 };
-                --thumb-link-color: #fff;
+
+                --header-background: #20242a;
+
+                --thumb-background: #272b33;
+                --thumb-link-color: #60657d;
+                --thumb-link-color-hover: #fff;
+
+
             }
 
             :host {
                 display: block;
                 @apply(--paper-font-common-base);
             }
-
+            .self-end {
+                -ms-align-self: flex-end;
+                -webkit-align-self: flex-end;
+                align-self: flex-end;
+            }
             paper-fab.rotated {
                 transform: rotate(-90deg);
                 transform-origin: 50% 50%;
             }
 
             #scrollLetterView {
-                --paper-fab-background: var(--paper-light-blue-500);
-                --paper-fab-keyboard-focus-background: var(--paper-light-blue-900);
+                color: var(--white-color);
+                --paper-fab-background: var(--blue-color);
+                --paper-fab-keyboard-focus-background: var(--blue-color);
             }
 
             .deleteIcon {
-                --paper-fab-background: var(--paper-light-blue-500);
-                --paper-fab-keyboard-focus-background: var(--paper-light-blue-900);
+                --paper-fab-background: var(--blue-color);
+                --paper-fab-keyboard-focus-background: var(--blue-color);
             }
 
             #scrollLetterView, #dd1, #dd2, #dd3, #dd4 {
@@ -120,10 +144,10 @@
                 left: 0;
                 right: 0;
                 z-index: 1;
-                background-color: var(--paper-toolbar-background);
+                background-color: var(--header-background);
                 color: var(--primary-text-color);
                 --app-header-background-front-layer: {
-                    background: var(--paper-toolbar-background);
+                    background: var(--header-background);
                 };
             }
 
@@ -146,11 +170,7 @@
             iron-list {
                 margin-top: 80px;
                 padding-bottom: 20px;
-            }
-
-            .self-end {
-                /* This mixin (from iron-flex-layout) aligns the tabs to the bottom of the toolbar. */
-                @apply(--layout-self-end);
+                background: var(--thumb-background);
             }
 
             #toastSuccess {
@@ -160,6 +180,12 @@
             #toastError {
                 --paper-toast-background-color: var(--ebooks-red);
                 --paper-toast-color: var(--thumb-link-color);
+            }
+            .semitrans {
+                opacity: 0.8;
+            }
+            .semitrans:hover {
+                opacity: 1;
             }
         </style>
 
@@ -214,14 +240,24 @@
         </iron-list>
 
         <div hidden$="{{!scrollLetterVisible}}">
-            <paper-fab id="dd1" hidden$="{{!scrollControlVisible}}" on-click="scroll2Top" icon="av:skip-next" class="rotated"></paper-fab>
-            <paper-fab id="dd2" hidden$="{{!scrollControlVisible}}" on-click="scrollUp" icon="av:fast-forward" class="rotated"></paper-fab>
+            <paper-fab id="dd1" hidden$="{{!scrollControlVisible}}" on-click="scroll2Top" icon="av:skip-next" class="rotated semitrans"></paper-fab>
+            <paper-fab id="dd2" hidden$="{{!scrollControlVisible}}" on-click="scrollUp" icon="av:fast-forward" class="rotated semitrans"></paper-fab>
 
-            <paper-fab id="scrollLetterView" label="[[scrollLetter]]" on-click="openDropdown"></paper-fab>
+            <paper-fab id="scrollLetterView" label="[[scrollLetter]]" on-click="_toggleScrollControl" class="semitrans semitrans"></paper-fab>
 
-            <paper-fab id="dd3" hidden$="{{!scrollControlVisible}}" on-click="scrollDown" icon="av:fast-rewind" class="rotated"></paper-fab>
-            <paper-fab id="dd4" hidden$="{{!scrollControlVisible}}" on-click="scroll2End" icon="av:skip-previous" class="rotated"></paper-fab>
+            <paper-fab id="dd3" hidden$="{{!scrollControlVisible}}" on-click="scrollDown" icon="av:fast-rewind" class="rotated semitrans"></paper-fab>
+            <paper-fab id="dd4" hidden$="{{!scrollControlVisible}}" on-click="scroll2End" icon="av:skip-previous" class="rotated semitrans"></paper-fab>
         </div>
+
+        <detail-dialog id="dialog"
+                       file="[[currentFile]]"
+                       thumb-css="[[thumbCss]]"
+                       tab-index="[[tabIndex]]"
+                       index="[[index]]"
+                       delete-visible="[[deleteVisible]]"
+                       copy-visible="[[copyVisible]]"
+                       sendLink-visible="[[sendLinkVisible]]"
+                       sendAttachment-visible="[[sendAttachmentVisible]]"></detail-dialog>
 
     </template>
 
@@ -233,6 +269,7 @@
                 properties: {
                     options: Object,
                     files: Array,
+                    currentFile: Object,
                     toastSuccessText: 'File copied successfully.',
                     toastErrorText: '',
                     filteredFiles: {
@@ -288,10 +325,15 @@
                     '_filterFiles(files, searchText)',
                     '_resetBySectionIndex(options.sectionIndex)',
                     '_resetByThumbDimsIndex(thumbDimsIndex)',
-                    'onActionResponse(ajaxGetResponse)'
+                    '_onActionResponse(ajaxGetResponse)'
                 ],
+                _computeImgUrl: function (file) {
+                    var img = file.replace('file/', 'img/');
+                    img = img.substr(0, img.lastIndexOf('.')) + '.jpg';
+                    return img;
+                },
 
-                onActionResponse: function (response) {
+                _onActionResponse: function (response) {
                     if (!response) return;
 
                     var file = response.file;
@@ -315,9 +357,11 @@
                     }
                 },
 
-                openDropdown: function () {
+                _toggleScrollControl: function () {
                     this.scrollControlVisible = !this.scrollControlVisible;
                 },
+
+
                 scroll2Top: function () {
                     this.listEle.scrollToIndex(0);
                 },
@@ -402,29 +446,35 @@
                     this.scrollLetter = !item ? '' : item.substr(idx + 1, 1).trim().toUpperCase();
                 },
 
-                // Element Lifecycle:
+                _scrollListener : function () {
+                    this._calcScrollLetter();
+                },
+
+                _onDetailAction: function(event){
+                    var detail = event.detail;
+                    var file = detail.file;
+                    if (detail.method !== 'delete' || confirm('Do you really want to delete ' + file + '?')) {
+                        this.$.ajaxGet.url = file.replace(/file[/|\\]/, detail.method + '/');
+                        this.$.ajaxGet.generateRequest();
+                    }
+                },
+
+                _onOpenDetailDialog: function(event){
+                    this.currentFile = event.detail.file;
+                    console.log('_onOpenDetailDialog', this.currentFile);
+                    this.$.dialog.open();
+                },
+
+                //   E l e m e n t   L i f e c y c l e :
                 attached: function () {
                     console.info('attached...');
-
                     this.listEle = this.$.list;
 
                     var self = this;
-                    var scrollListener = function () {
-                        self._calcScrollLetter();
-                    };
-                    this._calcScrollLetter.bind(this);
-
                     Polymer.RenderStatus.afterNextRender(this, function () {
-                        window.addEventListener('scroll', scrollListener);
-
-                        self.addEventListener('thumb-div-action', function(event){
-                            var detail = event.detail;
-                            var file = detail.file;
-                            if (detail.method !== 'delete' || confirm('Do you really want to delete ' + file + '?')) {
-                                self.$.ajaxGet.url = file.replace(/file[/|\\]/, detail.method + '/');
-                                self.$.ajaxGet.generateRequest();
-                            }
-                        });
+                        this.listen(window, 'scroll', '_scrollListener');
+                        this.listen(self, 'detailAction', '_onDetailAction');
+                        this.listen(self, 'openDetailDialog', '_onOpenDetailDialog');
                     });
                 },
                 ready: function () {}

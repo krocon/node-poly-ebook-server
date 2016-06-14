@@ -1,4 +1,4 @@
 
 #poly-ebook-server
 
-coming soon.
+see ../readme.md

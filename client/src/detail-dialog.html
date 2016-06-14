@@ -1,0 +1,156 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/paper-styles/color.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+
+<link rel="import" href="long-tap-behavior.html">
+
+
+<dom-module id="detail-dialog" >
+    <template>
+        <style is="custom-style">
+            .layout.horizontal,
+            .layout.horizontal-reverse,
+            .layout.vertical,
+            .layout.vertical-reverse {
+                display: -ms-flexbox;
+                display: -webkit-flex;
+                display: flex;
+            }
+
+            .layout.horizontal {
+                -ms-flex-direction: row;
+                -webkit-flex-direction: row;
+                flex-direction: row;
+            }
+
+            paper-fab {
+                cursor: pointer;
+                color: var(--fab-text-color);
+            }
+            paper-fab:hover {
+                color: var(--fab-text-hover-color);
+            }
+            paper-fab.pink {
+                background: var(--pink-color);
+            }
+            paper-fab.blue {
+                background: var(--blue-color);
+            }
+        </style>
+
+        <paper-dialog id="detailDialog" modal>
+            <p>[[_computeLabel(file)]]</p>
+            <p>[[file]]</p>
+
+            <p><iron-image sizing="cover" style="[[thumbCss]]" src="[[_computeImgUrl(file)]]"></iron-image></p>
+
+            <div class="detail horizontal layout">
+                <a href="../[[file]]" target="_blank">
+                    <paper-fab mini icon="file-download" class="pink"></paper-fab>
+                </a>
+                <paper-fab mini hidden$="[[!deleteVisible]]" icon="delete" class="blue deleteIcon" on-tap="deleteFile"></paper-fab>
+                <paper-fab mini hidden$="[[!copyVisible]]" icon="content-copy" class="blue copyIcon" on-tap="copyFile"></paper-fab>
+                <paper-fab mini hidden$="[[!sendLinkVisible]]" icon="send" class="blue" on-tap="sendLink"></paper-fab>
+                <paper-fab mini hidden$="[[!sendAttachmentVisible]]" icon="attachment" class="blue copyIcon" on-tap="sendAttachment"></paper-fab>
+            </div>
+
+
+            <div class="buttons">
+                <paper-button raised  dialog-confirm autofocus icon="close"><iron-icon icon="close"></iron-icon> Close</paper-button>
+            </div>
+        </paper-dialog>
+
+    </template>
+
+
+    <script>
+        HTMLImports.whenReady(function () {
+            Polymer({
+                is: 'detail-dialog',
+//                behaviors: [LongTapBehavior],
+                properties: {
+                    file: Object,
+                    deleteVisible: {
+                        type: Boolean,
+                        value: false
+                    },
+                    copyVisible: {
+                        type: Boolean,
+                        value: false
+                    },
+                    sendLinkVisible: {
+                        type: Boolean,
+                        value: false
+                    },
+                    sendAttachmentVisible: {
+                        type: Boolean,
+                        value: false
+                    },
+                    thumbCss: {
+                        type: String,
+                        value: ''
+                    }
+                },
+//                observers: [],
+//
+//                _onLongtap: function () {
+//                    console.info('_onLongTap', this.file);
+//                    this.fire('openDetailDialog', {file:this.file});
+//                },
+//
+//                _ondblclick: function () {
+//                    console.info('_ondblclick', this.file);
+//                    this.fire('openDetailDialog', {file:this.file});
+//                },
+
+                open: function(){
+                    this.$.detailDialog.open();
+                },
+
+                deleteFile: function (event, detail, sender) {
+                    this.fire('detailAction', {file: this.file, method: 'delete'});
+                },
+                copyFile: function (event, detail, sender) {
+                    this.fire('detailAction', {file: this.file, method: 'copy'});
+                },
+                sendAttachment: function (event, detail, sender) {
+                    this.fire('detailAction', {file: this.file, method: 'sendattachment'});
+                },
+                sendLink: function (event, detail, sender) {
+                    this.fire('detailAction', {file: this.file, method: 'sendlink'});
+                },
+
+
+                _computeTitle: function (file) {
+                    return file.substring(1 + file.lastIndexOf('/'));
+                },
+                _computeLabel: function (file) {
+                    var i = Math.max(file.lastIndexOf('\\'), file.lastIndexOf('/')) + 1;
+                    return file.substr(i);
+                },
+                _computeImgUrl: function (file) {
+                    var img = file.replace('file/', 'img/');
+                    img = img.substr(0, img.lastIndexOf('.')) + '.jpg';
+                    return img;
+                }
+
+
+                // Element Lifecycle:
+//                ready: function() {
+//                },
+//                attached: function() {
+//                    Polymer.RenderStatus.afterNextRender(this, function () {
+//                        this.listen(this, 'longtap', '_onLongtap');
+//                    });
+//                },
+//                detached: function() {
+//                }
+            });
+        });
+    </script>
+
+
+</dom-module>

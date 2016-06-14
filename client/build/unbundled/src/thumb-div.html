@@ -1,9 +1,5 @@
 <html><head><link rel="import" href="../bower_components/polymer/polymer.html">
-
 <link rel="import" href="../bower_components/iron-image/iron-image.html">
-<link rel="import" href="../bower_components/iron-flex-layout/classes/iron-flex-layout.html">
-<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
-
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/paper-styles/color.html">
 
@@ -12,23 +8,25 @@
 
 </head><body><dom-module id="thumb-div">
     <template>
-        <style is="custom-style">:host{display:block;box-sizing:border-box;}:root{--primary-text-color:#dae2f7;--photo-content-detail:{background:transparent;};--thumb-link-color:#dae2f7;}.thumbContent{@apply (--layout);position:relative;margin:0px;}.thumbContent:hover .detail{opacity:1;}.thumbContent .label{background-color:transparent;color:var(--primary-text-color);position:absolute;left:0;top:0;overflow:hidden;}.thumbContent > iron-image{@apply (--layout-flex);}.thumbContent > .detail{@apply (--photo-content-detail);position:absolute;bottom:0;left:0;right:0;font-size:18px;font-weight:bold;padding:0;opacity:0;transition:opacity 0.1s;}paper-fab.blue, a.blue{color:var(--thumb-link-color);cursor:pointer;--paper-fab-background:var(--paper-light-blue-500);--paper-fab-keyboard-focus-background:var(--paper-light-blue-900);}</style>
+        <style is="custom-style">:host{display:block;box-sizing:border-box;}:root{--layout-flex:{-ms-flex:1 1 0.000000001px;-webkit-flex:1;flex:1;-webkit-flex-basis:0.000000001px;flex-basis:0.000000001px;};}.layout.horizontal,
+            .layout.horizontal-reverse,
+            .layout.vertical,
+            .layout.vertical-reverse{display:-ms-flexbox;display:-webkit-flex;display:flex;}.layout.horizontal{-ms-flex-direction:row;-webkit-flex-direction:row;flex-direction:row;}.thumbContainer{background-color:var(--thumb-background);}.thumbContent{@apply (--layout);position:relative;margin:0px;}.thumbContent:hover .detail{opacity:1;}.thumbContent .label{background-color:transparent;color:var( --thumb-link-color);position:absolute;left:0;top:0;overflow:hidden;}.thumbContent:hover .label{color:var( --thumb-link-color-hover);}.thumbContent > .detail{@apply (--photo-content-detail);position:absolute;bottom:0;left:0;right:0;font-size:18px;font-weight:bold;padding:0;opacity:0;transition:opacity 0.1s;}paper-fab{cursor:pointer;color:var(--fab-text-color);}paper-fab:hover{color:var(--fab-text-hover-color);}paper-fab.pink, a.pink{background:var(--pink-color);}paper-fab.blue{background:var(--blue-color);}iron-image{width:100%;height:100%;}</style>
 
-        <div class="thumbContainer">
+        <div class="thumbContainer" on-dblclick="_ondblclick">
             <div class="thumbContent" style$="{{thumbCss}}" tabindex$="[[tabIndex]]" title="[[index]]) [[_computeTitle(file)]]">
-
                 <div class="label">[[_computeLabel(file)]]</div>
-
                 <iron-image sizing="cover" src="[[_computeImgUrl(file)]]"></iron-image>
 
                 <div class="detail horizontal layout">
                     <a href="../[[file]]" target="_blank">
-                        <paper-fab mini="" icon="cloud-download"></paper-fab>
+                        <paper-fab mini="" icon="file-download" class="pink"></paper-fab>
                     </a>
-                    <paper-fab mini="" hidden$="[[!deleteVisible]]" icon="delete" class="blue deleteIcon" on-tap="deleteFile"></paper-fab>
-                    <paper-fab mini="" hidden$="[[!copyVisible]]" icon="content-copy" class="blue copyIcon" on-tap="copyFile"></paper-fab>
-                    <paper-fab mini="" hidden$="[[!sendLinkVisible]]" icon="send" class="blue" on-tap="sendLink"></paper-fab>
-                    <paper-fab mini="" hidden$="[[!sendAttachmentVisible]]" icon="attachment" class="blue copyIcon" on-tap="sendAttachment"></paper-fab>
+                    <paper-fab mini="" icon="menu" class="blue deleteIcon" on-tap="_ondblclick"></paper-fab>
+                    
+                    
+                    
+                    
                 </div>
             </div>
         </div>
@@ -36,7 +34,7 @@
     </template>
 
 
-    <script>HTMLImports.whenReady(function(){Polymer({is:"thumb-div",behaviors:[LongTapBehavior],properties:{deleteVisible:{type:Boolean,value:!1},copyVisible:{type:Boolean,value:!1},sendLinkVisible:{type:Boolean,value:!1},sendAttachmentVisible:{type:Boolean,value:!1},thumbCss:{type:String,value:""}},observers:[],deleteFile:function(e,t,i){this.fire("thumb-div-action",{file:this.file,method:"delete"})},copyFile:function(e,t,i){this.fire("thumb-div-action",{file:this.file,method:"copy"})},sendAttachment:function(e,t,i){this.fire("thumb-div-action",{file:this.file,method:"sendattachment"})},sendLink:function(e,t,i){this.fire("thumb-div-action",{file:this.file,method:"sendlink"})},_computeTitle:function(e){return e.substring(1+e.lastIndexOf("/"))},_computeLabel:function(e){var t=Math.max(e.lastIndexOf("\\"),e.lastIndexOf("/"))+1;return e.substr(t)},_computeImgUrl:function(e){var t=e.replace("file/","img/");return t=t.substr(0,t.lastIndexOf("."))+".jpg"},ready:function(){},attached:function(){Polymer.RenderStatus.afterNextRender(this,function(){this.addEventListener("longtap",function(e,t,i){})})},detached:function(){}})});</script>
+    <script>HTMLImports.whenReady(function(){Polymer({is:"thumb-div",behaviors:[LongTapBehavior],properties:{deleteVisible:{type:Boolean,value:!1},copyVisible:{type:Boolean,value:!1},sendLinkVisible:{type:Boolean,value:!1},sendAttachmentVisible:{type:Boolean,value:!1},thumbCss:{type:String,value:""}},observers:[],_onLongtap:function(){console.info("_onLongTap",this.file),this.fire("openDetailDialog",{file:this.file})},_ondblclick:function(){console.info("_ondblclick",this.file),this.fire("openDetailDialog",{file:this.file})},deleteFile:function(e,t,i){this.fire("detailAction",{file:this.file,method:"delete"})},copyFile:function(e,t,i){this.fire("detailAction",{file:this.file,method:"copy"})},sendAttachment:function(e,t,i){this.fire("detailAction",{file:this.file,method:"sendattachment"})},sendLink:function(e,t,i){this.fire("detailAction",{file:this.file,method:"sendlink"})},_computeTitle:function(e){return e.substring(1+e.lastIndexOf("/"))},_computeLabel:function(e){var t=Math.max(e.lastIndexOf("\\"),e.lastIndexOf("/"))+1;return e.substr(t)},_computeImgUrl:function(e){var t=e.replace("file/","img/");return t=t.substr(0,t.lastIndexOf("."))+".jpg"},ready:function(){},attached:function(){Polymer.RenderStatus.afterNextRender(this,function(){this.listen(this,"longtap","_onLongtap")})},detached:function(){}})});</script>
 
 
 </dom-module></body></html>

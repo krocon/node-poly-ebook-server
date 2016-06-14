@@ -1,16 +1,12 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
-
 <link rel="import" href="../bower_components/iron-image/iron-image.html">
-<link rel="import" href="../bower_components/iron-flex-layout/classes/iron-flex-layout.html">
-<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
-
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/paper-styles/color.html">
 
 <link rel="import" href="long-tap-behavior.html">
 
 
-<dom-module id="thumb-div">
+<dom-module id="thumb-div" >
     <template>
         <style is="custom-style">
             :host {
@@ -18,13 +14,35 @@
                 box-sizing: border-box;
             }
             :root {
-                --primary-text-color: #dae2f7;
+                --layout-flex: {
+                    -ms-flex: 1 1 0.000000001px;
+                    -webkit-flex: 1;
+                    flex: 1;
+                    -webkit-flex-basis: 0.000000001px;
+                    flex-basis: 0.000000001px;
+                }
 
-                --photo-content-detail: {
-                    background: transparent;
-                };
-                --thumb-link-color: #dae2f7;
             }
+
+            .layout.horizontal,
+            .layout.horizontal-reverse,
+            .layout.vertical,
+            .layout.vertical-reverse {
+                display: -ms-flexbox;
+                display: -webkit-flex;
+                display: flex;
+            }
+
+            .layout.horizontal {
+                -ms-flex-direction: row;
+                -webkit-flex-direction: row;
+                flex-direction: row;
+            }
+
+            .thumbContainer {
+                background-color: var(--thumb-background);
+            }
+
             .thumbContent {
                 @apply(--layout);
                 position: relative;
@@ -37,16 +55,19 @@
 
             .thumbContent .label {
                 background-color: transparent;
-                color: var(--primary-text-color);
+                color: var( --thumb-link-color);
                 position: absolute;
                 left: 0;
                 top: 0;
                 overflow: hidden;
             }
-
-            .thumbContent > iron-image {
-                @apply(--layout-flex);
+            .thumbContent:hover .label {
+                color: var( --thumb-link-color-hover);
             }
+
+            /*.thumbContent > iron-image {*/
+                /*@apply(--layout-flex);*/
+            /*}*/
 
             .thumbContent > .detail {
                 @apply(--photo-content-detail);
@@ -61,30 +82,39 @@
                 transition: opacity 0.1s;
             }
 
-            paper-fab.blue, a.blue {
-                color: var(--thumb-link-color);
-                cursor: pointer;
 
-                --paper-fab-background: var(--paper-light-blue-500);
-                --paper-fab-keyboard-focus-background: var(--paper-light-blue-900);
+
+            paper-fab {
+                cursor: pointer;
+                color: var(--fab-text-color);
             }
+            paper-fab:hover {
+                color: var(--fab-text-hover-color);
+            }
+            paper-fab.pink, a.pink {
+                background: var(--pink-color);
+            }
+            paper-fab.blue {
+                background: var(--blue-color);
+            }
+
+            iron-image{ width:100%;height:100%;}
         </style>
 
-        <div class="thumbContainer">
+        <div class="thumbContainer" on-dblclick="_ondblclick">
             <div class="thumbContent" style$="{{thumbCss}}" tabindex$="[[tabIndex]]" title="[[index]]) [[_computeTitle(file)]]">
-
                 <div class="label">[[_computeLabel(file)]]</div>
-
-                <iron-image sizing="cover" src="[[_computeImgUrl(file)]]"></iron-image>
+                <iron-image sizing="cover" src="[[_computeImgUrl(file)]]" ></iron-image>
 
                 <div class="detail horizontal layout">
                     <a href="../[[file]]" target="_blank">
-                        <paper-fab mini icon="cloud-download"></paper-fab>
+                        <paper-fab mini icon="file-download" class="pink"></paper-fab>
                     </a>
-                    <paper-fab mini hidden$="[[!deleteVisible]]" icon="delete" class="blue deleteIcon" on-tap="deleteFile"></paper-fab>
-                    <paper-fab mini hidden$="[[!copyVisible]]" icon="content-copy" class="blue copyIcon" on-tap="copyFile"></paper-fab>
-                    <paper-fab mini hidden$="[[!sendLinkVisible]]" icon="send" class="blue" on-tap="sendLink"></paper-fab>
-                    <paper-fab mini hidden$="[[!sendAttachmentVisible]]" icon="attachment" class="blue copyIcon" on-tap="sendAttachment"></paper-fab>
+                    <paper-fab mini icon="menu" class="blue deleteIcon" on-tap="_ondblclick"></paper-fab>
+                    <!--<paper-fab mini hidden$="[[!deleteVisible]]" icon="delete" class="blue deleteIcon" on-tap="deleteFile"></paper-fab>-->
+                    <!--<paper-fab mini hidden$="[[!copyVisible]]" icon="content-copy" class="blue copyIcon" on-tap="copyFile"></paper-fab>-->
+                    <!--<paper-fab mini hidden$="[[!sendLinkVisible]]" icon="send" class="blue" on-tap="sendLink"></paper-fab>-->
+                    <!--<paper-fab mini hidden$="[[!sendAttachmentVisible]]" icon="attachment" class="blue copyIcon" on-tap="sendAttachment"></paper-fab>-->
                 </div>
             </div>
         </div>
@@ -121,17 +151,27 @@
                 },
                 observers: [],
 
+                _onLongtap: function () {
+                    console.info('_onLongTap', this.file);
+                    this.fire('openDetailDialog', {file:this.file});
+                },
+
+                _ondblclick: function () {
+                    console.info('_ondblclick', this.file);
+                    this.fire('openDetailDialog', {file:this.file});
+                },
+
                 deleteFile: function (event, detail, sender) {
-                    this.fire('thumb-div-action', {file: this.file, method: 'delete'});
+                    this.fire('detailAction', {file: this.file, method: 'delete'});
                 },
                 copyFile: function (event, detail, sender) {
-                    this.fire('thumb-div-action', {file: this.file, method: 'copy'});
+                    this.fire('detailAction', {file: this.file, method: 'copy'});
                 },
                 sendAttachment: function (event, detail, sender) {
-                    this.fire('thumb-div-action', {file: this.file, method: 'sendattachment'});
+                    this.fire('detailAction', {file: this.file, method: 'sendattachment'});
                 },
                 sendLink: function (event, detail, sender) {
-                    this.fire('thumb-div-action', {file: this.file, method: 'sendlink'});
+                    this.fire('detailAction', {file: this.file, method: 'sendlink'});
                 },
 
 
@@ -152,12 +192,8 @@
                 ready: function() {
                 },
                 attached: function() {
-                    var self = this;
                     Polymer.RenderStatus.afterNextRender(this, function () {
-                        this.addEventListener('longtap', function (event, detail, sender) {
-                            //console.info('inner : self.file ', self.file);
-                            // TODO
-                        })
+                        this.listen(this, 'longtap', '_onLongtap');
                     });
                 },
                 detached: function() {
