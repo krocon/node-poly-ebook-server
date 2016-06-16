@@ -1,0 +1,116 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/paper-styles/color.html">
+
+<link rel="import" href="../bower_components/iron-icons/av-icons.html">
+
+<dom-module id="scroll-control" >
+    <template>
+        <style is="custom-style">
+
+            :host {
+            }
+
+            paper-fab.rotated {
+                transform: rotate(-90deg);
+                transform-origin: 50% 50%;
+            }
+
+            .semitrans {
+                opacity: 0.8;
+            }
+            .semitrans:hover {
+                opacity: 1;
+            }
+
+            #scrollLetterView {
+                color: var(--white-color);
+                --paper-fab-background: var(--blue-color);
+                --paper-fab-keyboard-focus-background: var(--blue-color);
+            }
+
+            #scrollLetterView, #dd1, #dd2, #dd3, #dd4 {
+                position: fixed;
+                top: 50%;
+                right: 10px;
+            }
+
+            #dd1, #dd2, #dd3, #dd4 {
+                --paper-fab-background: var(--paper-toolbar-background);
+                --paper-fab-keyboard-focus-background: var(--primary-text-color);
+            }
+
+            #dd1 {
+                margin-top: -120px;
+            }
+
+            #dd2 {
+                margin-top: -60px;
+            }
+
+            #dd3 {
+                margin-top: 60px;
+            }
+
+            #dd4 {
+                margin-top: 120px;
+            }
+
+
+        </style>
+
+        <div hidden$="{{!indicatorVisible}}">
+            <paper-fab id="dd1" hidden$="{{!buttonsVisible}}" on-click="_scroll2Top" icon="av:skip-next" class="rotated semitrans"></paper-fab>
+            <paper-fab id="dd2" hidden$="{{!buttonsVisible}}" on-click="_scrollUp" icon="av:fast-forward" class="rotated semitrans"></paper-fab>
+
+            <paper-fab id="scrollLetterView" label="[[label]]" on-click="_toggleScrollControl" class="semitrans semitrans"></paper-fab>
+
+            <paper-fab id="dd3" hidden$="{{!buttonsVisible}}" on-click="_scrollDown" icon="av:fast-rewind" class="rotated semitrans"></paper-fab>
+            <paper-fab id="dd4" hidden$="{{!buttonsVisible}}" on-click="_scroll2End" icon="av:skip-previous" class="rotated semitrans"></paper-fab>
+        </div>
+
+    </template>
+
+
+    <script>
+        HTMLImports.whenReady(function () {
+            Polymer({
+                is: 'scroll-control',
+                properties: {
+                    indicatorVisible: {
+                        type: Boolean,
+                        value: true
+                    },
+                    buttonsVisible: {
+                        type: Boolean,
+                        value: false
+                    },
+                    label:{
+                        type: String,
+                        value: ''
+                    }
+                },
+                _toggleScrollControl: function () {
+                    this.buttonsVisible = !this.buttonsVisible;
+                },
+
+                _scroll2Top: function () {
+                    this.fire('scroll2Top', {});
+                },
+                _scrollUp: function () {
+                    this.fire('scrollUp', {});
+                },
+                _scrollDown: function () {
+                    this.fire('scrollDown', {});
+                },
+                _scroll2End: function () {
+                    this.fire('scroll2End', {});
+                }
+            });
+        });
+    </script>
+
+
+</dom-module>

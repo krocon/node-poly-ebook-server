@@ -1,9 +1,12 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
+
 <link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel=”import” href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/paper-styles/color.html">
 
-<link rel="import" href="long-tap-behavior.html">
+<link rel="import" href="./long-tap-behavior.html">
 
 
 <dom-module id="thumb-div" >
@@ -14,29 +17,6 @@
                 box-sizing: border-box;
             }
             :root {
-                --layout-flex: {
-                    -ms-flex: 1 1 0.000000001px;
-                    -webkit-flex: 1;
-                    flex: 1;
-                    -webkit-flex-basis: 0.000000001px;
-                    flex-basis: 0.000000001px;
-                }
-
-            }
-
-            .layout.horizontal,
-            .layout.horizontal-reverse,
-            .layout.vertical,
-            .layout.vertical-reverse {
-                display: -ms-flexbox;
-                display: -webkit-flex;
-                display: flex;
-            }
-
-            .layout.horizontal {
-                -ms-flex-direction: row;
-                -webkit-flex-direction: row;
-                flex-direction: row;
             }
 
             .thumbContainer {
@@ -65,11 +45,12 @@
                 color: var( --thumb-link-color-hover);
             }
 
-            /*.thumbContent > iron-image {*/
-                /*@apply(--layout-flex);*/
-            /*}*/
+            .thumbContent > iron-image {
+                @apply(--layout-flex);
+            }
 
             .thumbContent > .detail {
+                @apply(--layout-horizontal);
                 @apply(--photo-content-detail);
                 position: absolute;
                 bottom: 0;
@@ -102,12 +83,17 @@
         </style>
 
         <div class="thumbContainer" on-dblclick="_ondblclick">
-            <div class="thumbContent" style$="{{thumbCss}}" tabindex$="[[tabIndex]]" title="[[index]]) [[_computeTitle(file)]]">
+            <div class="thumbContent"
+                 style$="{{thumbCss}}"
+                 tabindex$="[[tabIndex]]"
+                 title$="[[index]]) [[_computeTitle(file)]]">
+
                 <div class="label">[[_computeLabel(file)]]</div>
+
                 <iron-image sizing="cover" src="[[_computeImgUrl(file)]]" ></iron-image>
 
-                <div class="detail horizontal layout">
-                    <a href="../[[file]]" target="_blank">
+                <div class="detail">
+                    <a href$="../[[file]]" target="_blank">
                         <paper-fab mini icon="file-download" class="pink"></paper-fab>
                     </a>
                     <paper-fab mini icon="menu" class="blue deleteIcon" on-tap="_ondblclick"></paper-fab>
@@ -145,6 +131,10 @@
                         value: false
                     },
                     thumbCss: {
+                        type: String,
+                        value: ''
+                    },
+                    file: {
                         type: String,
                         value: ''
                     }

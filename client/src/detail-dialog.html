@@ -1,9 +1,12 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel=”import” href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/paper-styles/color.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
 
 <link rel="import" href="long-tap-behavior.html">
 
@@ -11,19 +14,8 @@
 <dom-module id="detail-dialog" >
     <template>
         <style is="custom-style">
-            .layout.horizontal,
-            .layout.horizontal-reverse,
-            .layout.vertical,
-            .layout.vertical-reverse {
-                display: -ms-flexbox;
-                display: -webkit-flex;
-                display: flex;
-            }
-
-            .layout.horizontal {
-                -ms-flex-direction: row;
-                -webkit-flex-direction: row;
-                flex-direction: row;
+            .detail {
+                @apply(--layout-horizontal)
             }
 
             paper-fab {
@@ -39,16 +31,18 @@
             paper-fab.blue {
                 background: var(--blue-color);
             }
+
+            .buttons paper-button {cursor: pointer;}
         </style>
 
         <paper-dialog id="detailDialog" modal>
             <p>[[_computeLabel(file)]]</p>
             <p>[[file]]</p>
 
-            <p><iron-image sizing="cover" style="[[thumbCss]]" src="[[_computeImgUrl(file)]]"></iron-image></p>
+            <p><iron-image sizing="cover" style$="[[thumbCss]]" src$="[[_computeImgUrl(file)]]"></iron-image></p>
 
-            <div class="detail horizontal layout">
-                <a href="../[[file]]" target="_blank">
+            <div class="detail">
+                <a href$="../[[file]]" target="_blank">
                     <paper-fab mini icon="file-download" class="pink"></paper-fab>
                 </a>
                 <paper-fab mini hidden$="[[!deleteVisible]]" icon="delete" class="blue deleteIcon" on-tap="deleteFile"></paper-fab>
@@ -94,15 +88,8 @@
                         value: ''
                     }
                 },
-//                observers: [],
-//
 //                _onLongtap: function () {
 //                    console.info('_onLongTap', this.file);
-//                    this.fire('openDetailDialog', {file:this.file});
-//                },
-//
-//                _ondblclick: function () {
-//                    console.info('_ondblclick', this.file);
 //                    this.fire('openDetailDialog', {file:this.file});
 //                },
 
@@ -136,18 +123,6 @@
                     img = img.substr(0, img.lastIndexOf('.')) + '.jpg';
                     return img;
                 }
-
-
-                // Element Lifecycle:
-//                ready: function() {
-//                },
-//                attached: function() {
-//                    Polymer.RenderStatus.afterNextRender(this, function () {
-//                        this.listen(this, 'longtap', '_onLongtap');
-//                    });
-//                },
-//                detached: function() {
-//                }
             });
         });
     </script>
