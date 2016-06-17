@@ -1,3 +1,4 @@
+
 <link rel="import" href="../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../bower_components/iron-image/iron-image.html">
@@ -7,8 +8,6 @@
 <link rel="import" href="../bower_components/paper-styles/color.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
-
-<link rel="import" href="long-tap-behavior.html">
 
 
 <dom-module id="detail-dialog" >
@@ -33,6 +32,10 @@
             }
 
             .buttons paper-button {cursor: pointer;}
+
+            #pathDiv paper-button {
+                display: inline;
+            }
         </style>
 
         <paper-dialog id="detailDialog" modal>
@@ -40,6 +43,12 @@
             <p>[[file]]</p>
 
             <p><iron-image sizing="cover" style$="[[thumbCss]]" src$="[[_computeImgUrl(file)]]"></iron-image></p>
+
+            <div id="pathDiv" hidden$="!pathes">
+                <template is="dom-repeat" items="{{pathes}}">
+                    <paper-button on-tap="_setFilter" item="[[item]]">[[item]]</paper-button>/
+                </template>
+            </div>
 
             <div class="detail">
                 <a href$="../[[file]]" target="_blank">
@@ -64,7 +73,7 @@
         HTMLImports.whenReady(function () {
             Polymer({
                 is: 'detail-dialog',
-//                behaviors: [LongTapBehavior],
+
                 properties: {
                     file: Object,
                     deleteVisible: {
@@ -86,12 +95,37 @@
                     thumbCss: {
                         type: String,
                         value: ''
+                    },
+                    pathes: {
+                        type: Array,
+                        computed: '_computeArray(file)'
+                    },
+                    filters: {
+                        type: Array,
+                        value: []
                     }
                 },
-//                _onLongtap: function () {
-//                    console.info('_onLongTap', this.file);
-//                    this.fire('openDetailDialog', {file:this.file});
-//                },
+
+                _computeArray: function(file){
+                    var ret = [];
+                    if (file) {
+                        ret = file.split(/\\|\//);
+                        if (ret.length>0) {
+                            this.filters = ret[ret.length-1].split(/\.| |\-|_/);
+                        } else {
+                            this.filters = [];
+                        }
+                    }
+                    console.info('ret', ret);
+                    return ret;
+                },
+
+                _setFilter: function(event){
+                    var item = event.model.item;
+                    console.info('_setFilter', item);
+                    this.fire('doFilter', {text: item});
+                    this.$.detailDialog.close();
+                },
 
                 open: function(){
                     this.$.detailDialog.open();

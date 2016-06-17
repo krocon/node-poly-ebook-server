@@ -50,8 +50,7 @@
                 --ebooks-yellow: #face5c;
 
                 --pink-color: #c776df;
-                --blue-color: #6292f0cd client
-            ;
+                --blue-color: #6292f0;
                 --white-color: #fff;
                 --fab-text-color: #c8d5ef;
                 --fab-text-hover-color: #fff;
@@ -91,6 +90,14 @@
                 --scrollbar-background-color: #000;
                 --scrollbar-color: #050505;
 
+                --indicator-theme: {
+                    color: var(--white-color);
+                    background: var(--blue-color);
+                };
+                --indicator-button-theme: {
+                    background: var(--paper-toolbar-background);
+                    color: var(--white-color);
+                };
             }
 
 
@@ -99,15 +106,14 @@
             :host {
                 display: block;
                 @apply(--paper-font-common-base);
+
+
             }
-            /*.self-end {*/
-                /*-ms-align-self: flex-end;*/
-                /*-webkit-align-self: flex-end;*/
-                /*align-self: flex-end;*/
-            /*}*/
+
             #sectionTabs {
                 @apply(--layout-self-end)
             }
+
 
             .deleteIcon {
                 --paper-fab-background: var(--blue-color);
@@ -352,6 +358,13 @@
                 clearInput: function () {
                     this.searchText = '';
                 },
+                _onDoFilter: function (s) {
+                    if (s && s.detail) s = s.detail.text;
+                    this.searchText = s
+                            .replace(/,/g, ' ')
+                            .replace(/\./g, ' ')
+                            .replace(/\-/g, ' ');
+                },
 
                 _resetByThumbDimsIndex: function (thumbDimsIndex) {
                     this.scrollLetter = '';
@@ -459,6 +472,7 @@
                         this.listen(self, 'scrollDown', 'scrollDown');
                         this.listen(self, 'scrollUp', 'scrollUp');
                         this.listen(self, 'scroll2Top', 'scroll2Top');
+                        this.listen(self, 'doFilter', '_onDoFilter');
                     });
                 },
                 ready: function () {}

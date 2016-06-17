@@ -11,6 +11,14 @@
         <style is="custom-style">
 
             :host {
+
+            }
+            #scrollLetterView {
+                @apply(--indicator-theme);
+            }
+
+            #dd1, #dd2, #dd3, #dd4 {
+                @apply(--indicator-button-theme);
             }
 
             paper-fab.rotated {
@@ -25,21 +33,12 @@
                 opacity: 1;
             }
 
-            #scrollLetterView {
-                color: var(--white-color);
-                --paper-fab-background: var(--blue-color);
-                --paper-fab-keyboard-focus-background: var(--blue-color);
-            }
+
 
             #scrollLetterView, #dd1, #dd2, #dd3, #dd4 {
                 position: fixed;
                 top: 50%;
                 right: 10px;
-            }
-
-            #dd1, #dd2, #dd3, #dd4 {
-                --paper-fab-background: var(--paper-toolbar-background);
-                --paper-fab-keyboard-focus-background: var(--primary-text-color);
             }
 
             #dd1 {
