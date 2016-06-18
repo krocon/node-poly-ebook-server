@@ -2,6 +2,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel=”import” href="../bower_components/iron-flex-layout/iron-flex-layout.html">
 
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
@@ -52,9 +53,9 @@
                     <paper-fab mini icon="file-download" class="pink"></paper-fab>
                 </a>
                 <paper-fab mini hidden$="[[!deleteVisible]]" icon="delete" class="blue deleteIcon" on-tap="deleteFile"></paper-fab>
-                <paper-fab mini hidden$="[[!copyVisible]]" icon="content-copy" class="blue copyIcon" on-tap="copyFile"></paper-fab>
-                <paper-fab mini hidden$="[[!sendLinkVisible]]" icon="send" class="blue" on-tap="sendLink"></paper-fab>
-                <paper-fab mini hidden$="[[!sendAttachmentVisible]]" icon="attachment" class="blue copyIcon" on-tap="sendAttachment"></paper-fab>
+                <paper-fab mini hidden$="[[!copyVisible]]" icon="content-copy" class="blue" on-tap="copyFile"></paper-fab>
+                <paper-fab mini hidden$="[[!sendLinkVisible]]" icon="icons:send" class="blue" on-tap="sendLink"></paper-fab>
+                <paper-fab mini hidden$="[[!sendAttachmentVisible]]" icon="icons:attachment" class="blue" on-tap="sendAttachment"></paper-fab>
             </div>
 
 
@@ -109,7 +110,6 @@
                             }
                         }
                     }
-                    console.info('ret', ret);
                     return ret;
                 },
 

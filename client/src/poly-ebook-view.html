@@ -4,6 +4,7 @@
 <link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
 <link rel="import" href="../bower_components/app-layout/app-scroll-effects/effects/waterfall.html">
 <link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
 
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
@@ -11,6 +12,7 @@
 <link rel="import" href="../bower_components/iron-icons/av-icons.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/iron-label/iron-label.html">
 <link rel="import" href="../bower_components/iron-list/iron-list.html">
 
 <link rel=”import” href="../bower_components/iron-flex-layout/iron-flex-layout.html">
@@ -18,6 +20,7 @@
 <link rel="import" href="../bower_components/neon-animation/animations/scale-up-animation.html">
 <link rel="import" href="../bower_components/neon-animation/animations/fade-out-animation.html">
 
+<link rel="import" href="../bower_components/paper-badge/paper-badge.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
@@ -110,6 +113,14 @@
 
             }
 
+            app-drawer {
+                --app-drawer-width: 350px;
+                --app-drawer-content-container: {
+                    background-color: var(--paper-listbox-background-color);
+                    color: var(--primary-text-color);
+                }
+            }
+
             #sectionTabs {
                 @apply(--layout-self-end)
             }
@@ -168,6 +179,14 @@
                 --paper-toast-background-color: var(--ebooks-red);
                 --paper-toast-color: var(--thumb-link-color);
             }
+            /* Need to position the badge to look like a text superscript */
+            .container > paper-badge {
+                --paper-badge-margin-left: -10px;
+                --paper-badge-margin-bottom: -10px;
+            }
+
+            app-header h4 {margin-left: 15px;}
+            #leftDrawer p {margin-left: 15px;}
 
         </style>
 
@@ -181,6 +200,10 @@
         <app-header condenses fixed effects="blend-background waterfall">
             <app-toolbar>
 
+                <div class="container" tabindex="0">
+                    <paper-icon-button icon="icons:star" on-tap="toggleDrawer"></paper-icon-button>
+                    <paper-badge hidden$="[[!selectedItems.length]]" label$="[[selectedItems.length]]"></paper-badge>
+                </div>
                 <h4 title>[[options.title]] (<span class$="{{counterclass}}"><span hidden$="{{itemCounterHidden}}">{{filteredFiles.length}} / </span>{{files.length}}</span>)</h4>
 
                 <paper-tabs id="sectionTabs" selected="{{options.sectionIndex}}" class="bottom">
@@ -206,17 +229,25 @@
             </app-toolbar>
         </app-header>
 
-        <iron-list id="list" items="{{filteredFiles}}" as="file" scroll-target="document" grid>
+        <iron-list id="list"
+                   items="{{filteredFiles}}" as="file"
+                   scroll-target="document"
+                   grid
+                   selected-items="{{selectedItems}}"
+                   selection-enabled
+                   multi-selection
+                   >
             <template>
                 <thumb-div
-                        file="[[file]]"
-                        thumb-css="[[thumbCss]]"
-                        tab-index="[[tabIndex]]"
-                        index="[[index]]"
-                        delete-visible="[[deleteVisible]]"
-                        copy-visible="[[copyVisible]]"
-                        sendLink-visible="[[sendLinkVisible]]"
-                        sendAttachment-visible="[[sendAttachmentVisible]]"></thumb-div>
+                    file="[[file]]"
+                    selected="{{selected}}"
+                    thumb-css="[[thumbCss]]"
+                    tab-index="[[tabIndex]]"
+                    index="[[index]]"
+                    delete-visible="[[deleteVisible]]"
+                    copy-visible="[[copyVisible]]"
+                    sendLink-visible="[[sendLinkVisible]]"
+                    sendAttachment-visible="[[sendAttachmentVisible]]"></thumb-div>
             </template>
         </iron-list>
 
@@ -230,8 +261,28 @@
                        index="[[index]]"
                        delete-visible="[[deleteVisible]]"
                        copy-visible="[[copyVisible]]"
-                       sendLink-visible="[[sendLinkVisible]]"
-                       sendAttachment-visible="[[sendAttachmentVisible]]"></detail-dialog>
+                       send-link-visible="[[sendLinkVisible]]"
+                       send-attachment-visible="[[sendAttachmentVisible]]"></detail-dialog>
+
+        <app-drawer id="leftDrawer" swipe-open>
+            <br>
+            <br>
+            <br>
+            <p>Selected items: [[selectedItems.length]]</p>
+            <paper-button on-tap="deleteFiles" hidden$="[[!deleteVisible]]">Delete</paper-button>
+            <paper-button on-tap="copyFiles" hidden$="[[!copyVisible]]">Copy</paper-button>
+            <paper-button on-tap="sendLinks" hidden$="[[!sendLinkVisible]]">Send Link</paper-button>
+            <paper-button on-tap="sendAttachments" hidden$="[[!sendAttachmentVisible]]">Send Attachment</paper-button>
+
+
+            <!-- List for the selected items -->
+            <iron-list id="selectedItemsList" items="[[selectedItems]]" hidden$="[[!selectedItems.length]]">
+                <template>
+                    <paper-item tabindex$="[[tabIndex]]" on-tap="_unselect" aria-label$="Deselect [[item]]">[[_computeLabel(item)]]</paper-item>
+                </template>
+            </iron-list>
+
+        </app-drawer>
 
     </template>
 
@@ -297,7 +348,11 @@
                     },
                     scrollLetter: '',
                     listEle: HTMLElement,
-                    ajaxGetResponse: Object
+                    drawer: HTMLElement,
+                    ajaxGetResponse: Object,
+                    selectedItems: {
+                        type: Object
+                    }
                 },
                 observers: [
                     '_filterFiles(files, searchText)',
@@ -305,36 +360,32 @@
                     '_resetByThumbDimsIndex(thumbDimsIndex)',
                     '_onActionResponse(ajaxGetResponse)'
                 ],
-                _computeImgUrl: function (file) {
-                    var img = file.replace('file/', 'img/');
-                    img = img.substr(0, img.lastIndexOf('.')) + '.jpg';
-                    return img;
+
+                deleteFiles: function (event, detail, sender) {
+                    this.fire('detailAction', {files: this.selectedItems, method: 'delete'});
+                },
+                copyFiles: function (event, detail, sender) {
+                    this.fire('detailAction', {files: this.selectedItems, method: 'copy'});
+                },
+                sendAttachments: function (event, detail, sender) {
+                    this.fire('detailAction', {files: this.selectedItems, method: 'sendattachment'});
+                },
+                sendLinks: function (event, detail, sender) {
+                    this.fire('detailAction', {files: this.selectedItems, method: 'sendlink'});
                 },
 
-                _onActionResponse: function (response) {
-                    if (!response) return;
-
-                    var file = response.file;
-                    if (response.error) {
-                        this.toastErrorText = response.msg;
-                        this.$.toastError.open();
-                    } else {
-                        // Success:
-                        console.info('response.method === delete:', response.method === 'delete');
-                        if (response.method === 'delete') {
-                            var f = this.options.sectionIndex + '/file'+ file;
-                            var i = this.filteredFiles.indexOf(f);
-                            if (i > -1) this.filteredFiles.splice(i, 1);
-                            i = this.files.indexOf(f);
-                            if (i > -1) this.files.splice(i, 1);
-                            this.listEle.fire('iron-resize');
-                        } else {
-                            this.toastSuccessText = response.msg;
-                            this.$.toastSuccess.open();
-                        }
-                    }
+                _unselect: function(e){
+                    console.log('TODO', e);
+                },
+                toggleDrawer: function(){
+                    this.drawer.toggle();
                 },
 
+
+                _computeLabel: function (file) {
+                    var i = Math.max(file.lastIndexOf('\\'), file.lastIndexOf('/')) + 1;
+                    return file.substr(i);
+                },
                 scroll2Top: function () {
                     if (this.filteredFiles && this.filteredFiles.length >0 ) {
                         this.listEle.scrollToIndex(0);
@@ -388,11 +439,11 @@
                     this._resetByThumbDimsIndex(this.thumbDimsIndex);
                 },
                 _filterFiles: function (files, searchText) {
-                    var ret;
+
                     var filterWords;
                     this.scrollLetter = '';
 
-                    var isOk = function isOk(value) {
+                    var _hit = function isOk(value) {
                         for (var i = 0; i < filterWords.length; i++) {
                             var word = filterWords[i];
                             if (word && word.length > 0) {
@@ -408,14 +459,15 @@
                         return true;
                     };
 
-                    if (!files) ret = null;
-                    if (!ret && !searchText) ret = files;
+                    var _getFilteredFiles = function() {
+                        if (!files) return null;
+                        if (!searchText) return files;
 
-                    if (!ret) {
                         filterWords = searchText.toLowerCase().split(' ');
-                        ret = files.filter(isOk);
-                    }
-                    this.filteredFiles = ret;
+                        return files.filter(_hit);
+                    };
+
+                    this.filteredFiles = _getFilteredFiles();
                     this.itemCounterHidden = this.filteredFiles.length === this.files.length;
                     this.counterclass = this.filteredFiles.length === 0 ? 'red' : (this.itemCounterHidden ? 'green' : 'yellow');
 
@@ -445,10 +497,38 @@
 
                 _onDetailAction: function(event){
                     var detail = event.detail;
-                    var file = detail.file;
-                    if (detail.method !== 'delete' || confirm('Do you really want to delete ' + file + '?')) {
-                        this.$.ajaxGet.url = file.replace(/file[/|\\]/, detail.method + '/');
-                        this.$.ajaxGet.generateRequest();
+                    var files = detail.files;
+                    if (detail.method !== 'delete' || confirm('Do you really want to delete ?')) {
+                        for (var i=0; i<files.length; i++) {
+                            var file = files[i];
+                            this.$.ajaxGet.url = file.replace(/file[/|\\]/, detail.method + '/');
+                            this.$.ajaxGet.generateRequest();
+                        }
+                        this.listEle.clearSelection();
+                    }
+                },
+
+                _onActionResponse: function (response) {
+                    if (!response) return;
+
+                    var file = response.file;
+                    if (response.error) {
+                        this.toastErrorText = response.msg;
+                        this.$.toastError.open();
+                    } else {
+                        // Success:
+                        console.info('response.method:', response.method);
+                        if (response.method === 'delete') {
+                            var f = this.options.sectionIndex + '/file'+ file;
+                            var i = this.filteredFiles.indexOf(f);
+                            if (i > -1) this.filteredFiles.splice(i, 1);
+                            i = this.files.indexOf(f);
+                            if (i > -1) this.files.splice(i, 1);
+                            this.listEle.fire('iron-resize');
+                        } else {
+                            this.toastSuccessText = response.msg;
+                            this.$.toastSuccess.open();
+                        }
                     }
                 },
 
@@ -462,6 +542,7 @@
                 attached: function () {
                     console.info('attached...');
                     this.listEle = this.$.list;
+                    this.drawer = this.$.leftDrawer;
 
                     var self = this;
                     Polymer.RenderStatus.afterNextRender(this, function () {

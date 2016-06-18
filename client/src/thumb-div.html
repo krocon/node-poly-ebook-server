@@ -2,6 +2,9 @@
 
 <link rel="import" href="../bower_components/iron-image/iron-image.html">
 <link rel=”import” href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+
 
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/paper-styles/color.html">
@@ -33,6 +36,20 @@
                 opacity: 1;
             }
 
+            .thumbContent .star {
+                /*background-color: transparent;*/
+                /*color: var( --thumb-link-color);*/
+                position: absolute;
+                right: 10px;
+                top: 10px;
+                overflow: hidden;
+            }
+            .thumbContent .star[icon=star] {
+                color: var(--pink-color);
+            }
+            .thumbContent .star[icon=star-border] {
+                color: var(--fab-text-color);
+            }
             .thumbContent .label {
                 background-color: transparent;
                 color: var( --thumb-link-color);
@@ -80,6 +97,20 @@
             }
 
             iron-image{ width:100%;height:100%;}
+
+
+            /*.item:focus,*/
+            /*.item.selected:focus {*/
+                /*outline: 0;*/
+                /*!*background-color: #ddd;*!*/
+            /*}*/
+
+
+
+            /*.item.selected {*/
+                /*!*background-color: var(--google-grey-300);*!*/
+                /*border-bottom: 1px solid #ccc;*/
+            /*}*/
         </style>
 
         <div class="thumbContainer" on-dblclick="_ondblclick">
@@ -91,6 +122,9 @@
                 <div class="label">[[_computeLabel(file)]]</div>
 
                 <iron-image sizing="cover" src="[[_computeImgUrl(file)]]" ></iron-image>
+
+                <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
+
 
                 <div class="detail">
                     <a href$="../[[file]]" target="_blank">
@@ -130,6 +164,9 @@
                         type: Boolean,
                         value: false
                     },
+                    selected: {
+                        type: Boolean
+                    },
                     thumbCss: {
                         type: String,
                         value: ''
@@ -139,7 +176,15 @@
                         value: ''
                     }
                 },
-                observers: [],
+//                observers: ['_onSelectionChanged(selected)'],
+
+                iconForItem: function(isSelected) {
+                    return isSelected ? 'star' : 'star-border';
+                },
+
+//                _onSelectionChanged: function(selected){
+//                    this.fire('selectionChanged', {});
+//                },
 
                 _onLongtap: function () {
                     console.info('_onLongTap', this.file);
@@ -152,16 +197,16 @@
                 },
 
                 deleteFile: function (event, detail, sender) {
-                    this.fire('detailAction', {file: this.file, method: 'delete'});
+                    this.fire('detailAction', {files: [this.file], method: 'delete'});
                 },
                 copyFile: function (event, detail, sender) {
-                    this.fire('detailAction', {file: this.file, method: 'copy'});
+                    this.fire('detailAction', {files: [this.file], method: 'copy'});
                 },
                 sendAttachment: function (event, detail, sender) {
-                    this.fire('detailAction', {file: this.file, method: 'sendattachment'});
+                    this.fire('detailAction', {files: [this.file], method: 'sendattachment'});
                 },
                 sendLink: function (event, detail, sender) {
-                    this.fire('detailAction', {file: this.file, method: 'sendlink'});
+                    this.fire('detailAction', {files: [this.file], method: 'sendlink'});
                 },
 
 

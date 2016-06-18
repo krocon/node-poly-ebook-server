@@ -2,6 +2,9 @@
 
 <link rel="import" href="../bower_components/iron-image/iron-image.html">
 <link rel="”import”" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+
 
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/paper-styles/color.html">
@@ -11,7 +14,7 @@
 
 </head><body><dom-module id="thumb-div">
     <template>
-        <style is="custom-style">:host{display:block;box-sizing:border-box;}:root{}.thumbContainer{background-color:var(--thumb-background);}.thumbContent{@apply (--layout);position:relative;margin:0px;}.thumbContent:hover .detail{opacity:1;}.thumbContent .label{background-color:transparent;color:var( --thumb-link-color);position:absolute;left:0;top:0;overflow:hidden;}.thumbContent:hover .label{color:var( --thumb-link-color-hover);}.thumbContent > iron-image{@apply (--layout-flex);}.thumbContent > .detail{@apply (--layout-horizontal);@apply (--photo-content-detail);position:absolute;bottom:0;left:0;right:0;font-size:18px;font-weight:bold;padding:0;opacity:0;transition:opacity 0.1s;}paper-fab{cursor:pointer;color:var(--fab-text-color);}paper-fab:hover{color:var(--fab-text-hover-color);}paper-fab.pink, a.pink{background:var(--pink-color);}paper-fab.blue{background:var(--blue-color);}iron-image{width:100%;height:100%;}</style>
+        <style is="custom-style">:host{display:block;box-sizing:border-box;}:root{}.thumbContainer{background-color:var(--thumb-background);}.thumbContent{@apply (--layout);position:relative;margin:0px;}.thumbContent:hover .detail{opacity:1;}.thumbContent .star{position:absolute;right:10px;top:10px;overflow:hidden;}.thumbContent .star[icon=star]{color:var(--pink-color);}.thumbContent .star[icon=star-border]{color:var(--fab-text-color);}.thumbContent .label{background-color:transparent;color:var( --thumb-link-color);position:absolute;left:0;top:0;overflow:hidden;}.thumbContent:hover .label{color:var( --thumb-link-color-hover);}.thumbContent > iron-image{@apply (--layout-flex);}.thumbContent > .detail{@apply (--layout-horizontal);@apply (--photo-content-detail);position:absolute;bottom:0;left:0;right:0;font-size:18px;font-weight:bold;padding:0;opacity:0;transition:opacity 0.1s;}paper-fab{cursor:pointer;color:var(--fab-text-color);}paper-fab:hover{color:var(--fab-text-hover-color);}paper-fab.pink, a.pink{background:var(--pink-color);}paper-fab.blue{background:var(--blue-color);}iron-image{width:100%;height:100%;}</style>
 
         <div class="thumbContainer" on-dblclick="_ondblclick">
             <div class="thumbContent" style$="{{thumbCss}}" tabindex$="[[tabIndex]]" title$="[[index]]) [[_computeTitle(file)]]">
@@ -19,6 +22,9 @@
                 <div class="label">[[_computeLabel(file)]]</div>
 
                 <iron-image sizing="cover" src="[[_computeImgUrl(file)]]"></iron-image>
+
+                <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
+
 
                 <div class="detail">
                     <a href$="../[[file]]" target="_blank">
@@ -36,7 +42,7 @@
     </template>
 
 
-    <script>HTMLImports.whenReady(function(){Polymer({is:"thumb-div",behaviors:[LongTapBehavior],properties:{deleteVisible:{type:Boolean,value:!1},copyVisible:{type:Boolean,value:!1},sendLinkVisible:{type:Boolean,value:!1},sendAttachmentVisible:{type:Boolean,value:!1},thumbCss:{type:String,value:""},file:{type:String,value:""}},observers:[],_onLongtap:function(){console.info("_onLongTap",this.file),this.fire("openDetailDialog",{file:this.file})},_ondblclick:function(){console.info("_ondblclick",this.file),this.fire("openDetailDialog",{file:this.file})},deleteFile:function(e,t,i){this.fire("detailAction",{file:this.file,method:"delete"})},copyFile:function(e,t,i){this.fire("detailAction",{file:this.file,method:"copy"})},sendAttachment:function(e,t,i){this.fire("detailAction",{file:this.file,method:"sendattachment"})},sendLink:function(e,t,i){this.fire("detailAction",{file:this.file,method:"sendlink"})},_computeTitle:function(e){return e.substring(1+e.lastIndexOf("/"))},_computeLabel:function(e){var t=Math.max(e.lastIndexOf("\\"),e.lastIndexOf("/"))+1;return e.substr(t)},_computeImgUrl:function(e){var t=e.replace("file/","img/");return t=t.substr(0,t.lastIndexOf("."))+".jpg"},ready:function(){},attached:function(){Polymer.RenderStatus.afterNextRender(this,function(){this.listen(this,"longtap","_onLongtap")})},detached:function(){}})});</script>
+    <script>HTMLImports.whenReady(function(){Polymer({is:"thumb-div",behaviors:[LongTapBehavior],properties:{deleteVisible:{type:Boolean,value:!1},copyVisible:{type:Boolean,value:!1},sendLinkVisible:{type:Boolean,value:!1},sendAttachmentVisible:{type:Boolean,value:!1},selected:{type:Boolean},thumbCss:{type:String,value:""},file:{type:String,value:""}},iconForItem:function(e){return e?"star":"star-border"},_onLongtap:function(){console.info("_onLongTap",this.file),this.fire("openDetailDialog",{file:this.file})},_ondblclick:function(){console.info("_ondblclick",this.file),this.fire("openDetailDialog",{file:this.file})},deleteFile:function(e,t,i){this.fire("detailAction",{files:[this.file],method:"delete"})},copyFile:function(e,t,i){this.fire("detailAction",{files:[this.file],method:"copy"})},sendAttachment:function(e,t,i){this.fire("detailAction",{files:[this.file],method:"sendattachment"})},sendLink:function(e,t,i){this.fire("detailAction",{files:[this.file],method:"sendlink"})},_computeTitle:function(e){return e.substring(1+e.lastIndexOf("/"))},_computeLabel:function(e){var t=Math.max(e.lastIndexOf("\\"),e.lastIndexOf("/"))+1;return e.substr(t)},_computeImgUrl:function(e){var t=e.replace("file/","img/");return t=t.substr(0,t.lastIndexOf("."))+".jpg"},ready:function(){},attached:function(){Polymer.RenderStatus.afterNextRender(this,function(){this.listen(this,"longtap","_onLongtap")})},detached:function(){}})});</script>
 
 
 </dom-module></body></html>
