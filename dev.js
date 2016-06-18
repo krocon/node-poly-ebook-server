@@ -67,7 +67,31 @@
                 ],
                 dimIndex: 1,
                 initialFilter: ''
+            },
+            {
+                label: "Movies",
+                bookExtensions: ['.mkv','.avi'],
+                baseDir: "/Volumes/2TB/jdownload/_movies",
+                thumbsDims: [
+                    {width: 100, height: 150},
+                    {width: 200, height: 300},
+                    {width: 300, height: 450}
+                ],
+                dimIndex: 1,
+                initialFilter: ''
             }
+            // {
+            //     label: "Mov2",
+            //     bookExtensions: ['.mkv','.avi'],
+            //     baseDir: "/Volumes/video/Filme/201x/2015",
+            //     thumbsDims: [
+            //         {width: 100, height: 150},
+            //         {width: 200, height: 300},
+            //         {width: 300, height: 450}
+            //     ],
+            //     dimIndex: 0,
+            //     initialFilter: ''
+            // }
         ]
 
     };

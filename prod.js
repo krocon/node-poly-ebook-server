@@ -47,6 +47,30 @@
                 ],
                 dimIndex: 1,
                 initialFilter: ''
+            },
+            {
+                label: "Movies",
+                bookExtensions: ['.mkv','.avi'],
+                baseDir: "/Volumes/video/Filme",
+                thumbsDims: [
+                    {width: 100, height: 150},
+                    {width: 200, height: 300},
+                    {width: 300, height: 450}
+                ],
+                dimIndex: 0,
+                initialFilter: ''
+            },
+            {
+                label: "Serien",
+                bookExtensions: ['.mkv','.avi'],
+                baseDir: "/Volumes/video/Serien",
+                thumbsDims: [
+                    {width: 100, height: 150},
+                    {width: 200, height: 300},
+                    {width: 300, height: 450}
+                ],
+                dimIndex: 0,
+                initialFilter: ''
             }
         ]
 
