@@ -8,7 +8,7 @@
 
 </head><body><dom-module id="scroll-control">
     <template>
-        <style is="custom-style">:host{}paper-fab.rotated{transform:rotate(-90deg);transform-origin:50% 50%;}.semitrans{opacity:0.8;}.semitrans:hover{opacity:1;}#scrollLetterView{color:var(--white-color);--paper-fab-background:var(--blue-color);--paper-fab-keyboard-focus-background:var(--blue-color);}#scrollLetterView, #dd1, #dd2, #dd3, #dd4{position:fixed;top:50%;right:10px;}#dd1, #dd2, #dd3, #dd4{--paper-fab-background:var(--paper-toolbar-background);--paper-fab-keyboard-focus-background:var(--primary-text-color);}#dd1{margin-top:-120px;}#dd2{margin-top:-60px;}#dd3{margin-top:60px;}#dd4{margin-top:120px;}</style>
+        <style is="custom-style">:host{}#scrollLetterView{@apply (--indicator-theme);}#dd1, #dd2, #dd3, #dd4{@apply (--indicator-button-theme);}paper-fab.rotated{transform:rotate(-90deg);transform-origin:50% 50%;}.semitrans{opacity:0.8;}.semitrans:hover{opacity:1;}#scrollLetterView, #dd1, #dd2, #dd3, #dd4{position:fixed;top:50%;right:10px;}#dd1{margin-top:-120px;}#dd2{margin-top:-60px;}#dd3{margin-top:60px;}#dd4{margin-top:120px;}</style>
 
         <div hidden$="{{!indicatorVisible}}">
             <paper-fab id="dd1" hidden$="{{!buttonsVisible}}" on-click="_scroll2Top" icon="av:skip-next" class="rotated semitrans"></paper-fab>
