@@ -244,6 +244,7 @@
                     thumb-css="[[thumbCss]]"
                     tab-index="[[tabIndex]]"
                     index="[[index]]"
+                    epub-reader-visible="[[epubReaderVisible]]"
                     delete-visible="[[deleteVisible]]"
                     copy-visible="[[copyVisible]]"
                     sendLink-visible="[[sendLinkVisible]]"
@@ -259,6 +260,7 @@
                        thumb-css="[[thumbCss]]"
                        tab-index="[[tabIndex]]"
                        index="[[index]]"
+                       epub-reader-visible="[[epubReaderVisible]]"
                        delete-visible="[[deleteVisible]]"
                        copy-visible="[[copyVisible]]"
                        send-link-visible="[[sendLinkVisible]]"
@@ -434,6 +436,7 @@
                     this.thumbDimsIndex = section.dimIndex;
                     this.deleteVisible = !!section.trashDir;
                     this.copyVisible = !!section.copyDir;
+                    this.epubReaderVisible = !!section.epubReader;
                     this.sendLinkVisible = !!(section.sendOptions && section.sendOptions.sendlink);
                     this.sendAttachmentVisible = !!(section.sendOptions && section.sendOptions.sendattachment);
                     this._resetByThumbDimsIndex(this.thumbDimsIndex);
@@ -498,7 +501,7 @@
                 _onDetailAction: function(event){
                     var detail = event.detail;
                     var files = detail.files;
-                    if (detail.method !== 'delete' || confirm('Do you really want to delete ?')) {
+                    if (detail.method !== 'delete' || confirm('Do you really want to delete?')) {
                         for (var i=0; i<files.length; i++) {
                             var file = files[i];
                             this.$.ajaxGet.url = file.replace(/file[/|\\]/, detail.method + '/');

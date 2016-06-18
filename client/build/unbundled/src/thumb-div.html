@@ -30,6 +30,9 @@
                     <a href$="../[[file]]" target="_blank">
                         <paper-fab mini="" icon="file-download" class="pink"></paper-fab>
                     </a>
+                    <a href$="reader.html?u=../[[file]]" target="_blank" hidden$="[[!epubReaderVisible]]">
+                        <paper-fab mini="" icon="av:library-books" class="pink"></paper-fab>
+                    </a>
                     <paper-fab mini="" icon="menu" class="blue deleteIcon" on-tap="_ondblclick"></paper-fab>
                     
                     
@@ -42,7 +45,7 @@
     </template>
 
 
-    <script>HTMLImports.whenReady(function(){Polymer({is:"thumb-div",behaviors:[LongTapBehavior],properties:{deleteVisible:{type:Boolean,value:!1},copyVisible:{type:Boolean,value:!1},sendLinkVisible:{type:Boolean,value:!1},sendAttachmentVisible:{type:Boolean,value:!1},selected:{type:Boolean},thumbCss:{type:String,value:""},file:{type:String,value:""}},iconForItem:function(e){return e?"star":"star-border"},_onLongtap:function(){console.info("_onLongTap",this.file),this.fire("openDetailDialog",{file:this.file})},_ondblclick:function(){console.info("_ondblclick",this.file),this.fire("openDetailDialog",{file:this.file})},deleteFile:function(e,t,i){this.fire("detailAction",{files:[this.file],method:"delete"})},copyFile:function(e,t,i){this.fire("detailAction",{files:[this.file],method:"copy"})},sendAttachment:function(e,t,i){this.fire("detailAction",{files:[this.file],method:"sendattachment"})},sendLink:function(e,t,i){this.fire("detailAction",{files:[this.file],method:"sendlink"})},_computeTitle:function(e){return e.substring(1+e.lastIndexOf("/"))},_computeLabel:function(e){var t=Math.max(e.lastIndexOf("\\"),e.lastIndexOf("/"))+1;return e.substr(t)},_computeImgUrl:function(e){var t=e.replace("file/","img/");return t=t.substr(0,t.lastIndexOf("."))+".jpg"},ready:function(){},attached:function(){Polymer.RenderStatus.afterNextRender(this,function(){this.listen(this,"longtap","_onLongtap")})},detached:function(){}})});</script>
+    <script>HTMLImports.whenReady(function(){Polymer({is:"thumb-div",behaviors:[LongTapBehavior],properties:{deleteVisible:{type:Boolean,value:!1},epubReaderVisible:{type:Boolean,value:!1},copyVisible:{type:Boolean,value:!1},sendLinkVisible:{type:Boolean,value:!1},sendAttachmentVisible:{type:Boolean,value:!1},selected:{type:Boolean},thumbCss:{type:String,value:""},file:{type:String,value:""}},iconForItem:function(e){return e?"star":"star-border"},_onLongtap:function(){console.info("_onLongTap",this.file),this.fire("openDetailDialog",{file:this.file})},_ondblclick:function(){console.info("_ondblclick",this.file),this.fire("openDetailDialog",{file:this.file})},deleteFile:function(e,t,i){this.fire("detailAction",{files:[this.file],method:"delete"})},copyFile:function(e,t,i){this.fire("detailAction",{files:[this.file],method:"copy"})},sendAttachment:function(e,t,i){this.fire("detailAction",{files:[this.file],method:"sendattachment"})},sendLink:function(e,t,i){this.fire("detailAction",{files:[this.file],method:"sendlink"})},_computeTitle:function(e){return e.substring(1+e.lastIndexOf("/"))},_computeLabel:function(e){var t=Math.max(e.lastIndexOf("\\"),e.lastIndexOf("/"))+1;return e.substr(t)},_computeImgUrl:function(e){var t=e.replace("file/","img/");return t=t.substr(0,t.lastIndexOf("."))+".jpg"},ready:function(){},attached:function(){Polymer.RenderStatus.afterNextRender(this,function(){this.listen(this,"longtap","_onLongtap")})},detached:function(){}})});</script>
 
 
 </dom-module></body></html>

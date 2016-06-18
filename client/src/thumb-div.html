@@ -130,6 +130,9 @@
                     <a href$="../[[file]]" target="_blank">
                         <paper-fab mini icon="file-download" class="pink"></paper-fab>
                     </a>
+                    <a href$="reader.html?u=../[[file]]" target="_blank" hidden$="[[!epubReaderVisible]]">
+                        <paper-fab mini icon="av:library-books" class="pink"></paper-fab>
+                    </a>
                     <paper-fab mini icon="menu" class="blue deleteIcon" on-tap="_ondblclick"></paper-fab>
                     <!--<paper-fab mini hidden$="[[!deleteVisible]]" icon="delete" class="blue deleteIcon" on-tap="deleteFile"></paper-fab>-->
                     <!--<paper-fab mini hidden$="[[!copyVisible]]" icon="content-copy" class="blue copyIcon" on-tap="copyFile"></paper-fab>-->
@@ -149,6 +152,10 @@
                 behaviors: [LongTapBehavior],
                 properties: {
                     deleteVisible: {
+                        type: Boolean,
+                        value: false
+                    },
+                    epubReaderVisible: {
                         type: Boolean,
                         value: false
                     },
