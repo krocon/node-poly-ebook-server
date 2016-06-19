@@ -8,7 +8,7 @@ If for a book (abc.cbr) a thumb file exists (abc.jpg), the thumb will be display
 
 In the browser: all books are displayed in a thumb view. This view is optimized for a large number of books (Polymer iron-list).
 With help of a simple text input one can filter the list of the books.
-One can download a book, can send it (as link or attachment), oo delete it (move to a predefined trash folder).
+One can download a book, can send it (as link or attachment), or delete it (move to a predefined trash folder).
 An epub can be read online (in the browser).
 
 Technology: Server based on node.js, client based on Google Polymer.
