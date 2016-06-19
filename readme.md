@@ -84,6 +84,7 @@ In case of an error have a look at clientRoot: __dirname + '/../client'.
         ],
         dimIndex: 1,
         initialFilter: 'krimi -kill',
+        epubReader: true, // activates online epub reader
         trashDir: '/Users/marc/ebooks/trash', // if trashDir is defined, a delete button will be displayed.
         copyDir : '/Volumes/KOBOeReader', // tested with Kobo Aura H2O. Reader must be connected via USB.
         sendOptions: {
