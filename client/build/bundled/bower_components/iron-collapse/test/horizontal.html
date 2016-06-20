@@ -22,7 +22,7 @@
       </template>
     </test-fixture>
 
-    <script>suite("horizontal",function(){var t,e;setup(function(){t=fixture("test"),e=getComputedStyle(t).width}),test("opened attribute",function(){assert.equal(t.opened,!0)}),test("horizontal attribute",function(){assert.equal(t.horizontal,!0)}),test("default opened width",function(){assert.equal(t.style.width,"auto")}),test("set opened to false, then to true",function(n){t.addEventListener("transitionend",function(){t.opened?(assert.equal(t.style.width,"auto"),n()):(assert.equal(t.style.width,"0px"),t.opened=!0,assert.equal(t.style.width,e))}),t.opened=!1,assert.equal(t.style.width,"0px")})});</script>
+    <script>suite("horizontal",function(){var t,e;setup(function(){t=fixture("test"),e=getComputedStyle(t).width}),test("opened attribute",function(){assert.equal(t.opened,!0)}),test("horizontal attribute",function(){assert.equal(t.horizontal,!0)}),test("default opened width",function(){assert.equal(t.style.width,"")}),test("set opened to false, then to true",function(n){t.addEventListener("transitionend",function(){t.opened?(assert.equal(t.style.width,""),n()):(assert.equal(t.style.maxWidth,"0px"),t.opened=!0,assert.equal(t.style.maxWidth,e))}),t.opened=!1,assert.equal(t.style.maxWidth,"0px")})});</script>
 
   
 
