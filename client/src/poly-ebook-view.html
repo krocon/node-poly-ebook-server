@@ -188,6 +188,8 @@
             app-header h4 {margin-left: 15px;}
             #leftDrawer p {margin-left: 15px;padding-top: 60px;}
 
+            #leftDrawer #selectedItemsList p {margin-left:0;margin-right:0;padding-left:15px;padding-right:15px;}
+
         </style>
 
         <iron-ajax auto url="../init.json" handle-as="json" last-response="{{options}}"></iron-ajax>
@@ -231,7 +233,7 @@
 
         <iron-list id="list"
                    items="{{filteredFiles}}" as="file"
-                   __scroll-target="document"
+                   scroll-target="document"
                    grid
                    selected-items="{{selectedItems}}"
                    selection-enabled
@@ -277,7 +279,7 @@
 
                 <iron-list id="selectedItemsList" items="[[selectedItems]]" hidden$="[[!selectedItems.length]]">
                     <template>
-                        <paper-item tabindex$="[[tabIndex]]" on-tap="_unselect" aria-label$="Deselect [[item]]">[[_computeLabel(item)]]</paper-item>
+                        <p>[[_computeLabel(item)]]</p>
                     </template>
                 </iron-list>
             </div>
@@ -499,33 +501,22 @@
                     }
                 },
 
-//                getScrollPercent: function () {
-//                    var h = document.documentElement,
-//                        b = document.body,
-//                        l = this.listEle,
-//                        st = 'scrollTop',
-//                        sh = 'scrollHeight';
-//                    console.info('l[st]', l[st]);
-//                    console.info('l[sh]', l[sh]);
-//                    return h[st]||b[st] / ((h[sh]||b[sh]) - h.clientHeight) * 100;
-//                },
+                getScrollPercent: function () {
+                    var h = document.documentElement,
+                        b = document.body,
+                        l = this.listEle,
+                        st = 'scrollTop',
+                        sh = 'scrollHeight';
+                    return h[st]||b[st] / ((h[sh]||b[sh]) - h.clientHeight) * 100;
+                },
 
                 _scrollListener : function (e) {
-                    console.info('_scrollListener...');
-//                    this.listEle._scrollHandler(e);
-//                    this.listEle._updateScrollerSize(true);
                     this._calcScrollLetter(e);
 
-//                    if (this.listEle.lastVisibleIndex < this.filteredFiles.length - 1) {
-//                        //this.listEle.fire('iron-resize');
-//                        //console.info(this.getScrollPercent());
-//                    }
-//                    console.info('this.listEle.lastVisibleIndex', this.listEle.lastVisibleIndex);
-//                    console.info('this.listEle.firstVisibleIndex', this.listEle.firstVisibleIndex);
-//                    console.info('this.$.list.lastVisibleIndex', this.$.list.lastVisibleIndex);
-//                    console.info('this.$.list.firstVisibleIndex', this.$.list.firstVisibleIndex);
-//                    console.info('this.$.list.scrollTarget', this.$.list.scrollTarget);
-//                    console.info('%', this.getScrollPercent());
+                    if (this.listEle.lastVisibleIndex < this.filteredFiles.length - 1 && this.getScrollPercent() > 99.99) {
+                        console.info('fire...');
+                        this.listEle.fire('iron-resize');
+                    }
                 },
                 _listTap: function() {
                     var now = Date.now();
@@ -590,9 +581,9 @@
 
                     var self = this;
                     Polymer.RenderStatus.afterNextRender(this, function () {
-//                        this.listen(window, 'scroll', '_scrollListener');
+                        this.listen(window, 'scroll', '_scrollListener');
                         this.listen(document.body, 'scroll', '_scrollListener');
-//                        this.listen(self.listEle, 'scroll', '_scrollListener');
+                        this.listen(self.listEle, 'scroll', '_scrollListener');
                         this.listen(self, 'detailAction', '_onDetailAction');
                         this.listen(self, 'openDetailDialog', '_onOpenDetailDialog');
 
