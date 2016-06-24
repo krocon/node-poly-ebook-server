@@ -45,7 +45,7 @@
     </app-toolbar>
   </app-header>
 
-  <script>addEventListener("WebComponentsReady",function(){var e=document.querySelector("app-header"),t=document.querySelector(".bg-header"),r=e.offsetHeight,n=t.offsetHeight,o=function(){var o=window.scrollY;n>=o&&(o=1.5*o);var a=t.style;a.transform=a.webkitTransform="translate3d(0,"+-o+"px,0)",e.shadow=o>n-r};o(),addEventListener("scroll",o)});</script>
+  <script>addEventListener("WebComponentsReady",function(){var e=document.querySelector("app-header"),t=document.querySelector(".bg-header"),r=e.offsetHeight,n=t.offsetHeight,o=function(){var o=window.scrollY;o<=n&&(o=1.5*o);var a=t.style;a.transform=a.webkitTransform="translate3d(0,"+-o+"px,0)",e.shadow=o>n-r};o(),addEventListener("scroll",o)});</script>
 
 
 

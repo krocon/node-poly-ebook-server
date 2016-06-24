@@ -28,7 +28,7 @@
                     <paper-fab mini="" icon="file-download" class="pink"></paper-fab>
                 </a>
                 <a href$="reader.html?u=../[[file]]" target="_blank" hidden$="[[!epubReaderVisible]]">
-                    <paper-fab mini="" icon="av:library-books" class="pink"></paper-fab>
+                    <paper-fab mini="" icon="icons:visibility" class="pink"></paper-fab>
                 </a>
                 <paper-fab mini="" hidden$="[[!deleteVisible]]" icon="delete" class="blue deleteIcon" on-tap="deleteFile"></paper-fab>
                 <paper-fab mini="" hidden$="[[!copyVisible]]" icon="content-copy" class="blue" on-tap="copyFile"></paper-fab>
@@ -45,7 +45,7 @@
     </template>
 
 
-    <script>HTMLImports.whenReady(function(){Polymer({is:"detail-dialog",properties:{file:Object,deleteVisible:{type:Boolean,value:!1},epubReaderVisible:{type:Boolean,value:!1},copyVisible:{type:Boolean,value:!1},sendLinkVisible:{type:Boolean,value:!1},sendAttachmentVisible:{type:Boolean,value:!1},thumbCss:{type:String,value:""},pathes:{type:Array,computed:"_computeArray(file)"}},_computeArray:function(e){var t=[];if(e)for(var i=e.substr(0,e.lastIndexOf(".")).split(/\.| |\-|\\|\//),l=0;l<i.length;l++)i[l].length>2&&t.indexOf(-1==i[l])&&t.push(i[l].replace(/,|_|\./g," "));return t},_setFilter:function(e){var t=e.model.item;this.fire("doFilter",{text:t}),this.$.detailDialog.close()},open:function(){this.$.detailDialog.open()},deleteFile:function(e,t,i){this.fire("detailAction",{file:this.file,method:"delete"})},copyFile:function(e,t,i){this.fire("detailAction",{file:this.file,method:"copy"})},sendAttachment:function(e,t,i){this.fire("detailAction",{file:this.file,method:"sendattachment"})},sendLink:function(e,t,i){this.fire("detailAction",{file:this.file,method:"sendlink"})},_computeLabel:function(e){var t=Math.max(e.lastIndexOf("\\"),e.lastIndexOf("/"))+1;return e=e.substr(t),e=e.substring(1+e.lastIndexOf("/")),e.substr(0,e.lastIndexOf(".")).replace(/,|_|\./g," ")},_computeImgUrl:function(e){var t=e.replace("file/","img/");return t=t.substr(0,t.lastIndexOf("."))+".jpg"}})});</script>
+    <script>HTMLImports.whenReady(function(){Polymer({is:"detail-dialog",properties:{file:Object,deleteVisible:{type:Boolean,value:!1},epubReaderVisible:{type:Boolean,value:!1},copyVisible:{type:Boolean,value:!1},sendLinkVisible:{type:Boolean,value:!1},sendAttachmentVisible:{type:Boolean,value:!1},thumbCss:{type:String,value:""},pathes:{type:Array,computed:"_computeArray(file)"}},_computeArray:function(e){var t=[];if(e)for(var i=e.substr(0,e.lastIndexOf(".")).split(/\.| |\-|\\|\//),l=0;l<i.length;l++)i[l].length>2&&t.indexOf(i[l]==-1)&&t.push(i[l].replace(/,|_|\./g," "));return t},_setFilter:function(e){var t=e.model.item;this.fire("doFilter",{text:t}),this.$.detailDialog.close()},open:function(){this.$.detailDialog.open()},deleteFile:function(e,t,i){this.fire("detailAction",{file:this.file,method:"delete"})},copyFile:function(e,t,i){this.fire("detailAction",{file:this.file,method:"copy"})},sendAttachment:function(e,t,i){this.fire("detailAction",{file:this.file,method:"sendattachment"})},sendLink:function(e,t,i){this.fire("detailAction",{file:this.file,method:"sendlink"})},_computeLabel:function(e){var t=Math.max(e.lastIndexOf("\\"),e.lastIndexOf("/"))+1;return e=e.substr(t),e=e.substring(1+e.lastIndexOf("/")),e.substr(0,e.lastIndexOf(".")).replace(/,|_|\./g," ")},_computeImgUrl:function(e){var t=e.replace("file/","img/");return t=t.substr(0,t.lastIndexOf("."))+".jpg"}})});</script>
 
 
 </dom-module>

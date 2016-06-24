@@ -1,0 +1,1 @@
+"use strict";var ES6Promise=require("es6-promise").Promise;module.exports={Promise:ES6Promise};

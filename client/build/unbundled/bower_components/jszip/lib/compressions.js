@@ -1,0 +1,1 @@
+"use strict";var GenericWorker=require("./stream/GenericWorker");exports.STORE={magic:"\0\0",compressWorker:function(r){return new GenericWorker("STORE compression")},uncompressWorker:function(){return new GenericWorker("STORE decompression")}},exports.DEFLATE=require("./flate");

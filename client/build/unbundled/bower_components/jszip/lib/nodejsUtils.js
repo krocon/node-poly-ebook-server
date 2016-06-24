@@ -1,0 +1,1 @@
+"use strict";module.exports={isNode:"undefined"!=typeof Buffer,newBuffer:function(e,f){return new Buffer(e,f)},isBuffer:function(e){return Buffer.isBuffer(e)},isStream:function(e){return e&&"function"==typeof e.on&&"function"==typeof e.pause&&"function"==typeof e.resume}};
