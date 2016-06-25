@@ -490,8 +490,8 @@
                 },
 
                 _calcScrollLetter: function () {
-                    console.info('_calcScrollLetter()...   document.querySelector(iron-list):', document.querySelector('iron-list').firstVisibleIndex);
-                    console.info('_calcScrollLetter()...   this.listEle.firstVisibleIndex:', this.listEle.firstVisibleIndex);
+//                    console.info('_calcScrollLetter()...   document.querySelector(iron-list):', document.querySelector('iron-list').firstVisibleIndex);
+//                    console.info('_calcScrollLetter()...   this.listEle.firstVisibleIndex:', this.listEle.firstVisibleIndex);
                     var item = this.filteredFiles[this.listEle.firstVisibleIndex];
                     if (!item) {
                         this.scrollLetter = '';
@@ -569,7 +569,7 @@
 
                 _onOpenDetailDialog: function(event){
                     this.currentFile = event.detail.file;
-                    console.log('_onOpenDetailDialog', this.currentFile);
+                    //console.log('_onOpenDetailDialog', this.currentFile);
                     this.$.dialog.open();
                 },
 

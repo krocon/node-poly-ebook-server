@@ -12,7 +12,7 @@
 
 </head><body><dom-module id="detail-dialog">
     <template>
-        <style is="custom-style">.detail{@apply (--layout-horizontal);paper-fab{cursor:pointer;color:var(--fab-text-color);}paper-fab:hover{color:var(--fab-text-hover-color);}paper-fab.pink{background:var(--pink-color);}paper-fab.blue{background:var(--blue-color);}.buttons paper-button{cursor:pointer;}#pathDiv paper-button{display:inline;}}</style>
+        <style is="custom-style">.detail{@apply (--layout-horizontal);paper-fab{cursor:pointer;color:var(--fab-text-color);}paper-fab:hover{color:var(--fab-text-hover-color);}.detail a{text-decoration:none;}paper-button.pink{background-color:var(--pink-color);color:white;}paper-button.green{background-color:var(--paper-green-500);color:white;}paper-button.indigo{background-color:var(--paper-indigo-500);color:white;}.buttons paper-button{cursor:pointer;}#pathDiv paper-button{display:inline;}}</style>
 
         <paper-dialog id="detailDialog" modal="">
             <p>[[_computeLabel(file)]]</p>
@@ -25,20 +25,20 @@
 
             <div class="detail">
                 <a href$="../[[file]]" target="_blank">
-                    <paper-fab mini="" icon="file-download" class="pink"></paper-fab>
+                    <paper-button class="pink" raised=""><iron-icon icon="file-download"></iron-icon> Download</paper-button>
                 </a>
                 <a href$="reader.html?u=../[[file]]" target="_blank" hidden$="[[!epubReaderVisible]]">
-                    <paper-fab mini="" icon="icons:visibility" class="pink"></paper-fab>
+                    <paper-button class="pink" raised=""><iron-icon icon="icons:visibility"></iron-icon> Read Online</paper-button>
                 </a>
-                <paper-fab mini="" hidden$="[[!deleteVisible]]" icon="delete" class="blue deleteIcon" on-tap="deleteFile"></paper-fab>
-                <paper-fab mini="" hidden$="[[!copyVisible]]" icon="content-copy" class="blue" on-tap="copyFile"></paper-fab>
-                <paper-fab mini="" hidden$="[[!sendLinkVisible]]" icon="icons:send" class="blue" on-tap="sendLink"></paper-fab>
-                <paper-fab mini="" hidden$="[[!sendAttachmentVisible]]" icon="icons:attachment" class="blue" on-tap="sendAttachment"></paper-fab>
+                <paper-button class="green" hidden$="[[!deleteVisible]]" raised="" on-tap="deleteFile"><iron-icon icon="delete"></iron-icon> Delete</paper-button>
+                <paper-button class="green" hidden$="[[!copyVisible]]" raised="" on-tap="copyFile"><iron-icon icon="content-copy"></iron-icon> Copy</paper-button>
+                <paper-button class="green" hidden$="[[!sendLinkVisible]]" raised="" on-tap="sendLink"><iron-icon icon="icons:send"></iron-icon> Send Link</paper-button>
+                <paper-button class="green" hidden$="[[!sendAttachmentVisible]]" raised="" on-tap="sendAttachment"><iron-icon icon="icons:attachment"></iron-icon> Send Attachment</paper-button>
             </div>
 
 
             <div class="buttons">
-                <paper-button raised="" dialog-confirm="" autofocus="" icon="close"><iron-icon icon="close"></iron-icon> Close</paper-button>
+                <paper-button class="indigo" raised="" dialog-confirm="" autofocus="" icon="close"><iron-icon icon="close"></iron-icon> Close</paper-button>
             </div>
         </paper-dialog>
 

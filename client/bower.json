@@ -1,5 +1,6 @@
 {
   "name": "poly-ebook-client",
+  "version": "1.0.1",
   "description": "Private ebook client",
   "main": "index.html",
   "dependencies": {
@@ -25,8 +26,7 @@
     "paper-menu": "PolymerElements/paper-menu#^1.2.2",
     "paper-button": "PolymerElements/paper-button#^1.0.12",
     "paper-badge": "PolymerElements/paper-badge#^1.1.2",
-    "iron-label": "PolymerElements/iron-label#^1.0.2",
-    "jszip": "Stuk/jszip#^3.0.0"
+    "iron-label": "PolymerElements/iron-label#^1.0.2"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0",
