@@ -1,6 +1,6 @@
 {
   "name": "poly-ebook-server",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Webserver for own ebook content: comics and epubs (cbr,cbz,cb7,epub, PDF)",
   "keywords": [
     "Cover",

@@ -4,7 +4,8 @@ WebApp (Client/Server) for own ebook content: comics, pdfs and epubs (cbr,cbz,cb
 
 This tool serves ebooks of given directories (and their sub directories).
 Depending on the bookExtensions option one can show comics, ebooks or something else.
-If for a book (abc.cbr) a thumb file exists (abc.jpg), the thumb will be displayed instead of it's name.
+You can have poly-ebook-server display covers in a grid.
+A cover must be generated as a jpg image file at the same directory. The name must be derived from the ebook file name by changing its suffix (book “abc.cbr” ->  thumb file “abc.jpg”).
 
 In the browser: all books are displayed in a thumb view. This view is optimized for a large number of books (Polymer iron-list).
 With help of a simple text input one can filter the list of the books.
@@ -17,8 +18,9 @@ Technology: Server based on node.js, client based on Google Polymer.
 
 ## Preamble
 
-I use this tool to get an overview to my ebooks. With my iPad and Android tablet I can grabble my hole collection. An ebook is downloaded to the tablet with a simple click.
-In a later version I will integrate an online view, an internet search (to fetch book detail information), a toggle view (groupimg books) and so on. Feel free to give me feedback!
+I use this tool to get an overview of my ebooks. With my iPad and Android tablet I can grabble my hole collection.
+An ebook can be downloaded to the tablet by a simple click.
+In a later version I will integrate a comic online view, an internet search (to fetch book detail information), a toggle view (grouping books) and so on. Feel free to give me feedback!
 
 Second reason for coding this is learning Google Polymer [#UseThePlatform](https://www.polymer-project.org).
 
