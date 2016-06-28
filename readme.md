@@ -14,7 +14,9 @@ An epub can be read online (in the browser).
 
 Technology: Server based on node.js, client based on Google Polymer.
 
-![screen](https://cloud.githubusercontent.com/assets/11378781/16347460/26cfa874-3a4d-11e6-9739-14b3b464b3f0.png)
+![screen3](https://cloud.githubusercontent.com/assets/11378781/16426590/0667907c-3d6a-11e6-849a-89e157189839.png)
+
+![screen4](https://cloud.githubusercontent.com/assets/11378781/16426612/1b6da966-3d6a-11e6-9d39-ca0ec1a7a368.png)
 
 ## Preamble
 
