@@ -3,9 +3,11 @@
 WebApp (Client/Server) for own ebook content: comics, pdfs and epubs (cbr,cbz,cb7,epub,pdf,...).
 
 This tool serves ebooks of given directories (and their sub directories).
-Depending on the bookExtensions option one can show comics, ebooks or something else.
+Depending on the bookExtensions option it shows comics, ebooks or something else.
 You can have poly-ebook-server display covers in a grid.
-A cover must be generated as a jpg image file at the same directory. The name must be derived from the ebook file name by changing its suffix (book “abc.cbr” ->  thumb file “abc.jpg”).
+
+A cover must be generated as a jpg image file at the same directory.
+The name must be derived from the ebook file name by changing its suffix (book “abc.cbr” ->  thumb file “abc.jpg”).
 
 In the browser: all books are displayed in a thumb view. This view is optimized for a large number of books (Polymer iron-list).
 With help of a simple text input one can filter the list of the books.
